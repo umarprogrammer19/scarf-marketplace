@@ -35,12 +35,14 @@ export default function ProductGrid({ products }: ProductGridProps) {
 
   return (
     <>
-      <CategoryControls
-        gridColumns={gridColumns}
-        setGridColumns={setGridColumns}
-        sortBy={sortBy}
-        setSortBy={setSortBy}
-      />
+      <div id="products-section">
+        <CategoryControls
+          gridColumns={gridColumns}
+          setGridColumns={setGridColumns}
+          sortBy={sortBy}
+          setSortBy={setSortBy}
+        />
+      </div>
       
       <div className="container mx-auto px-4 pb-16">
         <div className={`grid ${gridClass} gap-4 md:gap-6`}>

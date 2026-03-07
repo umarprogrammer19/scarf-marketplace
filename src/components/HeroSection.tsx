@@ -1,4 +1,13 @@
+'use client'
+
 export default function HeroSection() {
+  const scrollToProducts = () => {
+    const productsSection = document.getElementById('products-section')
+    if (productsSection) {
+      productsSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
+
   return (
     <section className="relative bg-gradient-to-r from-yellow-700 to-yellow-800 text-white py-16 md:py-24 overflow-hidden">
       <div className="container mx-auto px-4 relative z-10">
@@ -11,10 +20,16 @@ export default function HeroSection() {
             From silk to velvet, find the perfect piece to elevate your style.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-white text-yellow-800 px-8 py-3 rounded-md font-semibold hover:bg-gray-100 transition-colors cursor-pointer">
+            <button 
+              onClick={scrollToProducts}
+              className="bg-white text-yellow-800 px-8 py-3 rounded-md font-semibold hover:bg-gray-100 transition-colors cursor-pointer"
+            >
               Shop New Arrivals
             </button>
-            <button className="border-2 border-white text-white px-8 py-3 rounded-md font-semibold hover:bg-white/10 transition-colors cursor-pointer">
+            <button 
+              onClick={scrollToProducts}
+              className="border-2 border-white text-white px-8 py-3 rounded-md font-semibold hover:bg-white/10 transition-colors cursor-pointer"
+            >
               View Collections
             </button>
           </div>
