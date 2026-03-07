@@ -88,7 +88,7 @@ Edit `src/data/products.ts` categories array:
 export const categories = [
   'Your Category 1',
   'Your Category 2',
-  // ... add more
+  'Your Category 3',
 ]
 ```
 
