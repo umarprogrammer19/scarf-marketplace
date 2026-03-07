@@ -3,4 +3,14 @@
 @theme {
   --font-family-playfair: 'Playfair Display', serif;
   --font-family-sans: 'Inter', sans-serif;
+  
+  /* Brand Colors - Elegant Fashion Theme */
+  --color-primary: #2C1810;        /* Rich Dark Brown */
+  --color-primary-light: #4A2C1F;  /* Medium Brown */
+  --color-secondary: #D4AF37;      /* Elegant Gold */
+  --color-accent: #8B6F47;         /* Warm Tan */
+  --color-background: #FAF8F5;     /* Soft Cream */
+  --color-surface: #FFFFFF;        /* Pure White */
+  --color-text-primary: #2C1810;   /* Dark Brown Text */
+  --color-text-secondary: #6B5D52; /* Muted Brown */
 }

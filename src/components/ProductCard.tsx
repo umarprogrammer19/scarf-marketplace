@@ -10,7 +10,7 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   return (
-    <div className="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300">
+    <div className="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer">
       <div className="relative aspect-square overflow-hidden bg-gray-100">
         <Image
           src={product.image}
@@ -22,7 +22,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         {/* Badges */}
         <div className="absolute top-2 left-2 flex flex-col gap-2">
           {product.isNew && (
-            <span className="bg-[#800020] text-white text-xs px-2 py-1 rounded">
+            <span className="bg-yellow-700 text-white text-xs px-2 py-1 rounded">
               NEW
             </span>
           )}
@@ -47,7 +47,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         </h3>
         
         <div className="flex items-center gap-2 mb-3">
-          <span className="text-lg font-bold text-[#800020]">
+          <span className="text-lg font-bold text-yellow-700">
             Rs. {product.price.toLocaleString()}
           </span>
           {product.originalPrice && (
@@ -59,7 +59,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         <button
           disabled={product.stock === 0}
-          className="w-full bg-[#800020] text-white py-2 rounded-md hover:bg-[#600018] transition-colors flex items-center justify-center gap-2 disabled:bg-gray-300 disabled:cursor-not-allowed"
+          className="w-full bg-yellow-700 text-white py-2 rounded-md hover:bg-yellow-800 transition-colors flex items-center justify-center gap-2 disabled:bg-gray-300 disabled:cursor-not-allowed cursor-pointer"
         >
           <ShoppingCart className="w-4 h-4" />
           <span className="text-sm font-medium">

@@ -16,14 +16,16 @@ export default function Navbar() {
   }, [])
 
   return (
-    <nav className={`bg-white transition-all duration-300 ${isSticky ? 'fixed top-0 left-0 right-0 z-50 shadow-md' : ''}`}>
+    <nav className={`bg-white border-b border-yellow-700/30 transition-all duration-300 ${isSticky ? 'fixed top-0 left-0 right-0 z-50 shadow-lg' : ''}`}>
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between py-4">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <h1 className="text-2xl md:text-3xl font-playfair font-bold text-[#800020]">
-              Elegance Scarves
-            </h1>
+            <img 
+              src="/my_image.jpeg" 
+              alt="Elegance Scarves Logo" 
+              className="h-12 md:h-16 w-auto object-contain"
+            />
           </div>
 
           {/* Categories - Hidden on mobile */}
@@ -31,7 +33,7 @@ export default function Navbar() {
             {categories.map((category) => (
               <button
                 key={category}
-                className="text-sm text-gray-700 hover:text-[#800020] transition-colors whitespace-nowrap"
+                className="text-sm text-gray-700 hover:text-yellow-700 transition-colors whitespace-nowrap font-medium cursor-pointer"
               >
                 {category}
               </button>
@@ -40,21 +42,21 @@ export default function Navbar() {
 
           {/* Icons */}
           <div className="flex items-center gap-4">
-            <button className="hover:text-[#800020] transition-colors">
+            <button className="text-gray-700 hover:text-yellow-700 transition-colors cursor-pointer">
               <Search className="w-5 h-5" />
             </button>
-            <button className="hover:text-[#800020] transition-colors">
+            <button className="text-gray-700 hover:text-yellow-700 transition-colors cursor-pointer">
               <User className="w-5 h-5" />
             </button>
-            <button className="relative hover:text-[#800020] transition-colors">
+            <button className="relative text-gray-700 hover:text-yellow-700 transition-colors cursor-pointer">
               <Heart className="w-5 h-5" />
-              <span className="absolute -top-2 -right-2 bg-[#800020] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              <span className="absolute -top-2 -right-2 bg-yellow-700 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
                 3
               </span>
             </button>
-            <button className="relative hover:text-[#800020] transition-colors">
+            <button className="relative text-gray-700 hover:text-yellow-700 transition-colors cursor-pointer">
               <ShoppingCart className="w-5 h-5" />
-              <span className="absolute -top-2 -right-2 bg-[#800020] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              <span className="absolute -top-2 -right-2 bg-yellow-700 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
                 2
               </span>
             </button>
@@ -66,7 +68,7 @@ export default function Navbar() {
           {categories.slice(0, 4).map((category) => (
             <button
               key={category}
-              className="text-xs text-gray-700 hover:text-[#800020] transition-colors px-2 py-1 bg-gray-50 rounded"
+              className="text-xs text-gray-700 hover:text-yellow-700 transition-colors px-2 py-1 bg-yellow-50 rounded cursor-pointer"
             >
               {category}
             </button>

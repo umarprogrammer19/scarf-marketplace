@@ -17,35 +17,35 @@ export default function CategoryControls({
   setSortBy
 }: CategoryControlsProps) {
   return (
-    <div className="bg-white border-y border-gray-200 py-4 px-4 mb-8">
+    <div className="bg-white border-y border-yellow-700/30 py-4 px-4 mb-8">
       <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
         {/* Grid Toggle */}
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-600 mr-2">View:</span>
           <button
             onClick={() => setGridColumns(2)}
-            className={`p-2 rounded ${gridColumns === 2 ? 'bg-[#800020] text-white' : 'bg-gray-100 text-gray-600'}`}
+            className={`p-2 rounded cursor-pointer ${gridColumns === 2 ? 'bg-yellow-700 text-white' : 'bg-gray-100 text-gray-600'}`}
             title="2 columns"
           >
             <Grid2X2 className="w-4 h-4" />
           </button>
           <button
             onClick={() => setGridColumns(3)}
-            className={`p-2 rounded ${gridColumns === 3 ? 'bg-[#800020] text-white' : 'bg-gray-100 text-gray-600'}`}
+            className={`p-2 rounded cursor-pointer ${gridColumns === 3 ? 'bg-yellow-700 text-white' : 'bg-gray-100 text-gray-600'}`}
             title="3 columns"
           >
             <Grid3X3 className="w-4 h-4" />
           </button>
           <button
             onClick={() => setGridColumns(4)}
-            className={`p-2 rounded ${gridColumns === 4 ? 'bg-[#800020] text-white' : 'bg-gray-100 text-gray-600'}`}
+            className={`p-2 rounded cursor-pointer ${gridColumns === 4 ? 'bg-yellow-700 text-white' : 'bg-gray-100 text-gray-600'}`}
             title="4 columns"
           >
             <LayoutGrid className="w-4 h-4" />
           </button>
           <button
             onClick={() => setGridColumns(5)}
-            className={`p-2 rounded ${gridColumns === 5 ? 'bg-[#800020] text-white' : 'bg-gray-100 text-gray-600'}`}
+            className={`p-2 rounded cursor-pointer ${gridColumns === 5 ? 'bg-yellow-700 text-white' : 'bg-gray-100 text-gray-600'}`}
             title="5 columns"
           >
             <Rows3 className="w-4 h-4" />
@@ -61,7 +61,7 @@ export default function CategoryControls({
             id="sort"
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as SortOption)}
-            className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#800020]"
+            className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-700 cursor-pointer"
           >
             <option value="featured">Featured</option>
             <option value="price-low">Price: Low to High</option>
