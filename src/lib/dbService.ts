@@ -50,6 +50,7 @@ export async function getProductById(id: string): Promise<Product | null> {
   }
 }
 
+
 // Create new product
 export async function createProduct(input: ProductCreateInput): Promise<Product> {
   try {
