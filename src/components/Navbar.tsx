@@ -1,62 +1,70 @@
 'use client'
 
 import { Search, User, Heart, ShoppingCart } from 'lucide-react'
-import { useState, useEffect } from 'react'
 import { categories } from '@/data/products'
+import Image from 'next/image'
 
 export default function Navbar() {
-  const [isSticky, setIsSticky] = useState(false)
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsSticky(window.scrollY > 100)
-    }
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+  const firstRow = categories.slice(0, 4)
+  const secondRow = categories.slice(4)
 
   return (
-    <nav className={`bg-white border-b border-yellow-700/30 transition-all duration-300 ${isSticky ? 'fixed top-0 left-0 right-0 z-50 shadow-lg' : ''}`}>
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between py-4">
+    <nav className="bg-white shadow-sm">
+      <div className="max-w-[1400px] mx-auto px-6">
+        <div className="flex items-center justify-between py-6">
           {/* Logo */}
-          <div className="flex-shrink-0">
-            <img 
+          <div className="flex-shrink-0 cursor-pointer">
+            <Image 
               src="/my_image.jpeg" 
-              alt="Elegance Scarves Logo" 
-              className="h-12 md:h-16 w-auto object-contain"
+              alt="Brand Logo" 
+              width={140}
+              height={70}
+              className="h-16 w-auto object-contain"
+              priority
             />
           </div>
 
-          {/* Categories - Hidden on mobile */}
-          <div className="hidden lg:flex flex-wrap items-center justify-center gap-x-6 gap-y-2 flex-1 px-8">
-            {categories.map((category) => (
-              <button
-                key={category}
-                className="text-sm text-gray-700 hover:text-yellow-700 transition-colors whitespace-nowrap font-medium cursor-pointer"
-              >
-                {category}
-              </button>
-            ))}
+          {/* Two-Row Categories - Hidden on mobile */}
+          <div className="hidden lg:flex flex-col items-center gap-4 flex-1 px-12">
+            <div className="flex items-center gap-8">
+              {firstRow.map((category) => (
+                <button
+                  key={category}
+                  className="text-[13px] text-[#2C1810] hover:text-[#D4AF37] transition-colors whitespace-nowrap font-normal tracking-wider uppercase cursor-pointer"
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+            <div className="flex items-center gap-8">
+              {secondRow.map((category) => (
+                <button
+                  key={category}
+                  className="text-[13px] text-[#2C1810] hover:text-[#D4AF37] transition-colors whitespace-nowrap font-normal tracking-wider uppercase cursor-pointer"
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Icons */}
-          <div className="flex items-center gap-4">
-            <button className="text-gray-700 hover:text-yellow-700 transition-colors cursor-pointer">
+          <div className="flex items-center gap-6">
+            <button className="text-[#2C1810] hover:text-[#D4AF37] transition-colors cursor-pointer">
               <Search className="w-5 h-5" />
             </button>
-            <button className="text-gray-700 hover:text-yellow-700 transition-colors cursor-pointer">
+            <button className="text-[#2C1810] hover:text-[#D4AF37] transition-colors cursor-pointer">
               <User className="w-5 h-5" />
             </button>
-            <button className="relative text-gray-700 hover:text-yellow-700 transition-colors cursor-pointer">
+            <button className="relative text-[#2C1810] hover:text-[#D4AF37] transition-colors cursor-pointer">
               <Heart className="w-5 h-5" />
-              <span className="absolute -top-2 -right-2 bg-yellow-700 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
+              <span className="absolute -top-2 -right-2 bg-[#D4AF37] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
                 3
               </span>
             </button>
-            <button className="relative text-gray-700 hover:text-yellow-700 transition-colors cursor-pointer">
+            <button className="relative text-[#2C1810] hover:text-[#D4AF37] transition-colors cursor-pointer">
               <ShoppingCart className="w-5 h-5" />
-              <span className="absolute -top-2 -right-2 bg-yellow-700 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
+              <span className="absolute -top-2 -right-2 bg-[#D4AF37] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
                 2
               </span>
             </button>
@@ -64,15 +72,17 @@ export default function Navbar() {
         </div>
 
         {/* Mobile Categories */}
-        <div className="lg:hidden pb-4 flex flex-wrap gap-2">
-          {categories.slice(0, 4).map((category) => (
-            <button
-              key={category}
-              className="text-xs text-gray-700 hover:text-yellow-700 transition-colors px-2 py-1 bg-yellow-50 rounded cursor-pointer"
-            >
-              {category}
-            </button>
-          ))}
+        <div className="lg:hidden pb-4 overflow-x-auto">
+          <div className="flex gap-3 min-w-max">
+            {categories.map((category) => (
+              <button
+                key={category}
+                className="text-xs text-[#2C1810] hover:text-[#D4AF37] transition-colors px-3 py-1.5 bg-gray-50 rounded whitespace-nowrap uppercase tracking-wide cursor-pointer"
+              >
+                {category}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </nav>

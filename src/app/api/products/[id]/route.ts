@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getProductById, updateProduct, deleteProduct } from '@/lib/productService'
+import { getProductById, updateProduct, deleteProduct } from '@/lib/dbService'
 import { ApiResponse } from '@/types/api'
 import { Product } from '@/types/product'
 
@@ -9,7 +9,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const product = getProductById(params.id)
+    const product = await getProductById(params.id)
     
     if (!product) {
       const response: ApiResponse = {
@@ -26,6 +26,7 @@ export async function GET(
     
     return NextResponse.json(response, { status: 200 })
   } catch (error) {
+    console.error('GET /api/products/[id] error:', error)
     const response: ApiResponse = {
       success: false,
       error: 'Failed to fetch product'
@@ -43,7 +44,7 @@ export async function PUT(
   try {
     const body = await request.json()
     
-    const updatedProduct = updateProduct(params.id, body)
+    const updatedProduct = await updateProduct(params.id, body)
     
     if (!updatedProduct) {
       const response: ApiResponse = {
@@ -61,6 +62,7 @@ export async function PUT(
     
     return NextResponse.json(response, { status: 200 })
   } catch (error) {
+    console.error('PUT /api/products/[id] error:', error)
     const response: ApiResponse = {
       success: false,
       error: 'Failed to update product'
@@ -76,7 +78,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const deleted = deleteProduct(params.id)
+    const deleted = await deleteProduct(params.id)
     
     if (!deleted) {
       const response: ApiResponse = {
@@ -93,6 +95,7 @@ export async function DELETE(
     
     return NextResponse.json(response, { status: 200 })
   } catch (error) {
+    console.error('DELETE /api/products/[id] error:', error)
     const response: ApiResponse = {
       success: false,
       error: 'Failed to delete product'

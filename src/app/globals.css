@@ -1,16 +1,48 @@
 @import "tailwindcss";
 
-@theme {
-  --font-family-playfair: 'Playfair Display', serif;
-  --font-family-sans: 'Inter', sans-serif;
-  
-  /* Brand Colors - Elegant Fashion Theme */
-  --color-primary: #2C1810;        /* Rich Dark Brown */
-  --color-primary-light: #4A2C1F;  /* Medium Brown */
-  --color-secondary: #D4AF37;      /* Elegant Gold */
-  --color-accent: #8B6F47;         /* Warm Tan */
-  --color-background: #FAF8F5;     /* Soft Cream */
-  --color-surface: #FFFFFF;        /* Pure White */
-  --color-text-primary: #2C1810;   /* Dark Brown Text */
-  --color-text-secondary: #6B5D52; /* Muted Brown */
+:root {
+  /* Brand Colors - Update these to match your logo */
+  --color-primary: #2C1810;
+  --color-primary-light: #4A2C1F;
+  --color-accent: #8B1538;
+  --color-accent-light: #A91D47;
+  --color-gold: #D4AF37;
+  --color-background: #FAFAFA;
+  --color-surface: #FFFFFF;
 }
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-background);
+}
+
+.font-serif {
+  font-family: 'Playfair Display', serif;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-accent);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent-light);
+}
+
+

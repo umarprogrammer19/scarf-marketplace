@@ -1,7 +1,4 @@
-'use client'
-
 import { Product } from '@/types/product'
-import { ShoppingCart } from 'lucide-react'
 import Image from 'next/image'
 
 interface ProductCardProps {
@@ -9,63 +6,61 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+  const isSoldOut = product.stock === 0
+
   return (
-    <div className="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer">
-      <div className="relative aspect-square overflow-hidden bg-gray-100">
+    <div className="group bg-white overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-[1.02] cursor-pointer">
+      <div className="relative aspect-[3/4] overflow-hidden bg-gray-50">
         <Image
           src={product.image}
           alt={product.title}
           fill
-          className="object-cover group-hover:scale-110 transition-transform duration-500"
+          className="object-cover transition-transform duration-500 group-hover:scale-110"
         />
         
-        {/* Badges */}
-        <div className="absolute top-2 left-2 flex flex-col gap-2">
-          {product.isNew && (
-            <span className="bg-yellow-700 text-white text-xs px-2 py-1 rounded">
-              NEW
-            </span>
-          )}
-          {product.discount && (
-            <span className="bg-red-500 text-white text-xs px-2 py-1 rounded">
-              -{product.discount}%
-            </span>
-          )}
-        </div>
+        {/* Discount Badge */}
+        {product.discount && !isSoldOut && (
+          <div className="absolute top-3 right-3 bg-[#D4AF37] text-white px-3 py-1.5 text-xs font-semibold tracking-wider uppercase shadow-lg">
+            {product.discount}% OFF
+          </div>
+        )}
+
+        {/* New Badge */}
+        {product.isNew && !isSoldOut && (
+          <div className="absolute top-3 left-3 bg-[#2C1810] text-white px-3 py-1.5 text-xs font-semibold tracking-wider uppercase">
+            NEW
+          </div>
+        )}
 
         {/* Sold Out Overlay */}
-        {product.stock === 0 && (
-          <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-            <span className="text-white text-lg font-semibold">SOLD OUT</span>
+        {isSoldOut && (
+          <div className="absolute inset-0 bg-gray-900/70 flex items-center justify-center backdrop-blur-sm">
+            <span className="bg-gray-600 text-white px-8 py-3 text-sm font-semibold tracking-widest uppercase">
+              Sold Out
+            </span>
           </div>
         )}
       </div>
 
-      <div className="p-4">
-        <h3 className="text-sm font-medium text-gray-800 mb-2 line-clamp-2 min-h-[40px]">
+      <div className="p-5 space-y-3 bg-white">
+        <p className="text-xs text-[#D4AF37] font-medium tracking-widest uppercase">
+          {product.category}
+        </p>
+        
+        <h3 className="text-sm font-normal text-[#2C1810] tracking-wide line-clamp-2 min-h-[2.5rem] leading-relaxed">
           {product.title}
         </h3>
         
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-lg font-bold text-yellow-700">
-            Rs. {product.price.toLocaleString()}
+        <div className="flex items-center gap-3 pt-1">
+          <span className="text-lg font-semibold text-[#2C1810]">
+            PKR {product.price.toLocaleString()}
           </span>
           {product.originalPrice && (
             <span className="text-sm text-gray-400 line-through">
-              Rs. {product.originalPrice.toLocaleString()}
+              PKR {product.originalPrice.toLocaleString()}
             </span>
           )}
         </div>
-
-        <button
-          disabled={product.stock === 0}
-          className="w-full bg-yellow-700 text-white py-2 rounded-md hover:bg-yellow-800 transition-colors flex items-center justify-center gap-2 disabled:bg-gray-300 disabled:cursor-not-allowed cursor-pointer"
-        >
-          <ShoppingCart className="w-4 h-4" />
-          <span className="text-sm font-medium">
-            {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
-          </span>
-        </button>
       </div>
     </div>
   )

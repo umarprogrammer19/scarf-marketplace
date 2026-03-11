@@ -1,12 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAllProducts, createProduct } from '@/lib/productService'
+import { getAllProducts, createProduct } from '@/lib/dbService'
 import { ApiResponse } from '@/types/api'
 import { Product } from '@/types/product'
 
 // GET /api/products - Get all products
 export async function GET(request: NextRequest) {
   try {
-    const products = getAllProducts()
+    const { searchParams } = new URL(request.url)
+    const category = searchParams.get('category')
+    const inStock = searchParams.get('inStock')
+
+    let products: Product[]
+
+    if (category) {
+      const { getProductsByCategory } = await import('@/lib/dbService')
+      products = await getProductsByCategory(category)
+    } else if (inStock === 'true') {
+      const { getInStockProducts } = await import('@/lib/dbService')
+      products = await getInStockProducts()
+    } else {
+      products = await getAllProducts()
+    }
     
     const response: ApiResponse<Product[]> = {
       success: true,
@@ -15,6 +29,7 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json(response, { status: 200 })
   } catch (error) {
+    console.error('GET /api/products error:', error)
     const response: ApiResponse = {
       success: false,
       error: 'Failed to fetch products'
@@ -38,7 +53,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(response, { status: 400 })
     }
     
-    const newProduct = createProduct(body)
+    const newProduct = await createProduct(body)
     
     const response: ApiResponse<Product> = {
       success: true,
@@ -48,6 +63,7 @@ export async function POST(request: NextRequest) {
     
     return NextResponse.json(response, { status: 201 })
   } catch (error) {
+    console.error('POST /api/products error:', error)
     const response: ApiResponse = {
       success: false,
       error: 'Failed to create product'
