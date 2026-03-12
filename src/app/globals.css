@@ -28,3 +28,7 @@ body {
   background-color: var(--color-background);
   color: var(--color-text-main);
 }
+
+button {
+  cursor: pointer;
+}
