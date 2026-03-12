@@ -1,64 +1,97 @@
-import Image from "next/image";
+// src/app/page.tsx
+import { db } from "@/db";
+import { products } from "@/db/schema";
+import { desc } from "drizzle-orm";
+import Link from "next/link";
+import Navbar from "@/components/storefront/Navbar";
 
-export default function Home() {
+// Next.js will revalidate this page every 60 seconds so new products show up quickly
+export const revalidate = 60;
+
+export default async function Home() {
+  // Fetch the 8 newest products from the database
+  const latestProducts = await db
+    .select()
+    .from(products)
+    .orderBy(desc(products.createdAt))
+    .limit(8);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
+
+      <main className="flex-1">
+        {/* Hero Section */}
+        <section className="relative h-[70vh] flex items-center justify-center bg-surface overflow-hidden border-b border-gray-800">
+          <div className="absolute inset-0 bg-[url('/hero-bg-placeholder.jpg')] bg-cover bg-center opacity-20"></div>
+          <div className="relative z-10 text-center px-4 max-w-3xl mx-auto">
+            <h1 className="text-5xl md:text-7xl font-serif text-text-main mb-6 leading-tight">
+              Elegance Woven in Every Thread
+            </h1>
+            <p className="text-lg text-text-muted mb-10 max-w-xl mx-auto">
+              Discover our latest collection of premium scarves, meticulously crafted in Pakistan for the modern wardrobe.
+            </p>
+            <Link
+              href="/shop"
+              className="inline-block bg-gold hover:bg-gold-hover text-background font-bold text-lg py-4 px-10 rounded-full transition-colors uppercase tracking-wide"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+              Shop the Collection
+            </Link>
+          </div>
+        </section>
+
+        {/* Featured Products Grid */}
+        <section className="py-24 container mx-auto px-4">
+          <div className="flex justify-between items-end mb-12">
+            <div>
+              <h2 className="text-3xl font-serif text-gold mb-2">New Arrivals</h2>
+              <p className="text-text-muted">The latest additions to our premium collection.</p>
+            </div>
+            <Link href="/shop" className="hidden md:block text-text-main hover:text-gold transition-colors border-b border-gold pb-1">
+              View All
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {latestProducts.length === 0 ? (
+              <p className="text-text-muted col-span-full text-center py-10">No products found. Add some from the admin panel!</p>
+            ) : (
+              latestProducts.map((product) => (
+                <Link href={`/product/${product.slug}`} key={product.id} className="group flex flex-col">
+                  {/* Product Image Container */}
+                  <div className="relative aspect-4/5 bg-surface rounded-xl overflow-hidden border border-gray-800 mb-4">
+                    <img
+                      src={product.imageUrl}
+                      alt={product.name}
+                      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+                    />
+                    {/* Badges */}
+                    <div className="absolute top-4 left-4 flex flex-col gap-2">
+                      {product.isNew && (
+                        <span className="bg-text-main text-background text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                          New
+                        </span>
+                      )}
+                      {product.isOnSale && (
+                        <span className="bg-gold text-background text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                          Sale
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Product Details */}
+                  <h3 className="text-lg font-serif text-text-main group-hover:text-gold transition-colors truncate">
+                    {product.name}
+                  </h3>
+                  <p className="text-text-muted mt-1 font-medium">
+                    Rs. {Number(product.price).toLocaleString()}
+                  </p>
+                </Link>
+              ))
+            )}
+          </div>
+        </section>
       </main>
     </div>
   );
