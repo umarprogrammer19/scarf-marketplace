@@ -5,11 +5,16 @@
   --foreground: #171717;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@theme {
+  /* Our Midnight Onyx & Gold Palette */
+  --color-background: #121212;
+  --color-surface: #1E1E1E;
+
+  --color-gold: #C5A059;
+  --color-gold-hover: #D4B371;
+
+  --color-text-main: #F3F4F6;
+  --color-text-muted: #9CA3AF;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -20,6 +25,6 @@
 }
 
 body {
-  background-color: theme('colors.background');
-  color: #F3F4F6;
+  background-color: var(--color-background);
+  color: var(--color-text-main);
 }
