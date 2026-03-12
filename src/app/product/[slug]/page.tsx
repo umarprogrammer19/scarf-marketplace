@@ -14,10 +14,11 @@ interface ProductPageProps {
 
 export default async function ProductPage({ params }: ProductPageProps) {
     // 1. Fetch the exact product from Neon DB matching the slug in the URL
+    const { slug } = await params;
     const productArray = await db
         .select()
         .from(products)
-        .where(eq(products.slug, params.slug))
+        .where(eq(products.slug, slug))
         .limit(1);
 
     const product = productArray[0];
