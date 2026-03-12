@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Inter } from 'next/font/google'
+import { Playfair_Display, Montserrat } from 'next/font/google'
 import "./globals.css";
+import LenisSmoothScroll from "@/components/LenisSmoothScroll";
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
@@ -8,15 +9,15 @@ const playfair = Playfair_Display({
   display: 'swap',
 })
 
-const inter = Inter({
+const montserrat = Montserrat({
   subsets: ['latin'],
-  variable: '--font-inter',
+  variable: '--font-montserrat',
   display: 'swap',
 })
 
 export const metadata: Metadata = {
-  title: "Elegance Scarves - Premium Women's Scarf Collection",
-  description: "Shop the finest collection of silk, velvet, and cotton scarves. Free delivery across Pakistan.",
+  title: "LUXE SCARVES | The Hijab Company - Premium Scarf & Hijab Collection",
+  description: "Discover our curated collection of luxury scarves and hijabs. Premium silk, chiffon, velvet, and more. Free shipping across Pakistan.",
 };
 
 export default function RootLayout({
@@ -25,9 +26,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
-      <body className="font-sans antialiased text-gray-900">
-        {children}
+    <html lang="en" className={`${montserrat.variable} ${playfair.variable}`}>
+      <body className="font-montserrat antialiased text-[#1A1A1A] bg-[#F9F7F2]">
+        <LenisSmoothScroll>
+          {children}
+        </LenisSmoothScroll>
       </body>
     </html>
   );

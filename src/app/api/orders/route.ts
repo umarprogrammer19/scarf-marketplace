@@ -63,11 +63,11 @@ export async function POST(request: NextRequest) {
     }
     
     return NextResponse.json(response, { status: 201 })
-  } catch (error) {
+  } catch (error: any) {
     console.error('POST /api/orders error:', error)
     const response: ApiResponse = {
       success: false,
-      error: 'Failed to create order'
+      error: error.message || 'Failed to create order'
     }
     
     return NextResponse.json(response, { status: 500 })

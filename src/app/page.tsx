@@ -8,7 +8,7 @@ import { products } from '@/data/products'
 
 export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col bg-[#FAFAFA]">
+    <div className="min-h-screen flex flex-col bg-[#F9F7F2]">
       <TopBar />
       <Navbar />
       <main className="flex-1">

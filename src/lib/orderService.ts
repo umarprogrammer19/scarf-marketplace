@@ -53,6 +53,8 @@ export async function getOrderById(id: string): Promise<Order | null> {
 // Create new order
 export async function createOrder(input: OrderCreateInput): Promise<Order> {
   try {
+    console.log('Creating order with input:', input)
+    
     const rows = await sql`
       INSERT INTO orders (
         customer_name,
@@ -68,7 +70,7 @@ export async function createOrder(input: OrderCreateInput): Promise<Order> {
         ${input.customerName},
         ${input.customerEmail},
         ${input.customerPhone},
-        ${JSON.stringify(input.items)},
+        ${JSON.stringify(input.items)}::jsonb,
         ${input.totalAmount},
         'pending',
         ${input.paymentMethod},
@@ -77,10 +79,11 @@ export async function createOrder(input: OrderCreateInput): Promise<Order> {
       RETURNING *
     `
     
+    console.log('Order created successfully:', rows[0])
     return mapRowToOrder(rows[0])
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating order:', error)
-    throw new Error('Failed to create order')
+    throw new Error(`Failed to create order: ${error.message}`)
   }
 }
 
