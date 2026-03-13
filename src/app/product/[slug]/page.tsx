@@ -66,7 +66,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
                     {/* Right Column: Product Details */}
                     <div className="flex flex-col justify-center">
-                        <h1 className="text-4xl md:text-5xl font-serif text-text-main mb-4 leading-tight">
+                        <h1 className="text-4xl md:text-5xl  text-text-main mb-4 leading-tight">
                             {product.name}
                         </h1>
 

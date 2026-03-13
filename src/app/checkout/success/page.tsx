@@ -25,7 +25,7 @@ export default async function SuccessPage({
                         <CheckCircle size={64} className="text-green-500" />
                     </div>
 
-                    <h1 className="text-3xl font-serif text-text-main mb-2 relative z-10">Order Confirmed!</h1>
+                    <h1 className="text-3xl  text-text-main mb-2 relative z-10">Order Confirmed!</h1>
                     <p className="text-text-muted mb-6 relative z-10">
                         Thank you for shopping with Al Faizan. Your premium scarves are being prepared for dispatch.
                     </p>
