@@ -21,61 +21,63 @@ export default async function AdminOrdersPage() {
 
     return (
         <div>
-            <h1 className="text-3xl font-serif text-text-main mb-8">Order Management (COD)</h1>
+            <div className="mb-8">
+                <h1 className="text-4xl font-bold text-foreground mb-2">Order Management</h1>
+                <p className="text-muted-foreground">Manage COD orders and track shipments</p>
+            </div>
 
-            <div className="bg-surface rounded-xl border border-gray-800 overflow-hidden">
+            <div className="bg-card rounded-xl border border-border overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse min-w-200">
+                    <table className="w-full text-left border-collapse min-w-max">
                         <thead>
-                            <tr className="border-b border-gray-800 bg-background/50">
-                                <th className="p-4 text-sm font-medium text-text-muted">Order ID</th>
-                                <th className="p-4 text-sm font-medium text-text-muted">Customer Details</th>
-                                <th className="p-4 text-sm font-medium text-text-muted">Date</th>
-                                <th className="p-4 text-sm font-medium text-text-muted">Total (Rs.)</th>
-                                <th className="p-4 text-sm font-medium text-text-muted">Status</th>
-                                <th className="p-4 text-sm font-medium text-text-muted">Action</th>
+                            <tr className="border-b border-border bg-secondary/50">
+                                <th className="p-4 text-sm font-semibold text-foreground">Order ID</th>
+                                <th className="p-4 text-sm font-semibold text-foreground">Customer Details</th>
+                                <th className="p-4 text-sm font-semibold text-foreground">Date</th>
+                                <th className="p-4 text-sm font-semibold text-foreground">Total (Rs.)</th>
+                                <th className="p-4 text-sm font-semibold text-foreground">Status</th>
+                                <th className="p-4 text-sm font-semibold text-foreground">Action</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-800/50">
+                        <tbody className="divide-y divide-border">
                             {allOrders.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="p-8 text-center text-text-muted">No orders yet.</td>
+                                    <td colSpan={6} className="p-8 text-center text-muted-foreground">No orders yet.</td>
                                 </tr>
                             ) : (
                                 allOrders.map((order) => (
-                                    <tr key={order.id} className="hover:bg-background/30 transition-colors">
-                                        <td className="p-4 font-medium text-text-main">{order.orderNumber}</td>
+                                    <tr key={order.id} className="hover:bg-secondary/30 transition-colors">
+                                        <td className="p-4 font-medium text-foreground">{order.orderNumber}</td>
 
                                         <td className="p-4">
-                                            <p className="text-text-main font-medium">{order.customerName}</p>
-                                            <p className="text-xs text-text-muted">{order.customerPhone}</p>
-                                            <p className="text-xs text-text-muted mt-1 truncate max-w-50" title={`${order.shippingAddress}, ${order.city}`}>
+                                            <p className="text-foreground font-medium text-sm">{order.customerName}</p>
+                                            <p className="text-xs text-muted-foreground">{order.customerPhone}</p>
+                                            <p className="text-xs text-muted-foreground mt-1 truncate max-w-xs" title={`${order.shippingAddress}, ${order.city}`}>
                                                 {order.city}
                                             </p>
                                         </td>
 
-                                        <td className="p-4 text-sm text-text-muted">
+                                        <td className="p-4 text-sm text-muted-foreground">
                                             {new Date(order.createdAt).toLocaleDateString()}
                                         </td>
 
-                                        <td className="p-4 font-bold text-gold">
+                                        <td className="p-4 font-bold text-primary">
                                             {Number(order.totalAmount).toLocaleString()}
                                         </td>
 
                                         <td className="p-4">
-                                            <span className={`px-3 py-1 text-xs font-bold rounded-full border ${getStatusColor(order.status)}`}>
+                                            <span className={`px-3 py-1 text-xs font-semibold rounded-full border ${getStatusColor(order.status)}`}>
                                                 {order.status}
                                             </span>
                                         </td>
 
                                         <td className="p-4">
-                                            {/* Simple form to update status */}
                                             <form action={updateOrderStatus} className="flex items-center gap-2">
                                                 <input type="hidden" name="orderId" value={order.id} />
                                                 <select
                                                     name="status"
                                                     defaultValue={order.status}
-                                                    className="bg-background border border-gray-700 text-sm text-text-main rounded-lg px-2 py-1 outline-none focus:border-gold"
+                                                    className="bg-secondary border border-border text-sm text-foreground rounded-lg px-2 py-1.5 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors"
                                                 >
                                                     <option value="PENDING">Pending</option>
                                                     <option value="CONFIRMED">Confirmed</option>
@@ -83,7 +85,7 @@ export default async function AdminOrdersPage() {
                                                     <option value="DELIVERED">Delivered</option>
                                                     <option value="CANCELLED">Cancelled</option>
                                                 </select>
-                                                <button type="submit" className="text-xs bg-gold/10 text-gold hover:bg-gold hover:text-background px-3 py-1.5 rounded-lg transition-colors font-medium">
+                                                <button type="submit" className="text-xs bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground px-3 py-1.5 rounded-lg transition-colors font-semibold">
                                                     Update
                                                 </button>
                                             </form>
