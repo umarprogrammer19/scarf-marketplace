@@ -107,3 +107,7 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #e5c158;
 }
+
+body {
+  font-family: sans-serif;
+}

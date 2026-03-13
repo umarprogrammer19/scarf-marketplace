@@ -14,6 +14,7 @@ interface ProductCardProps {
     isOnSale?: boolean;
     rating?: number;
     onAddToCart?: () => void;
+    slug: string
 }
 
 export default function ProductCard({
@@ -25,6 +26,7 @@ export default function ProductCard({
     isOnSale,
     rating = 4.5,
     onAddToCart,
+    slug
 }: ProductCardProps) {
     const [isWishlisted, setIsWishlisted] = useState(false);
     const [imageError, setImageError] = useState(false);
@@ -35,7 +37,7 @@ export default function ProductCard({
                 {/* Image Container */}
                 <div className="relative overflow-hidden rounded-xl bg-secondary h-64 sm:h-72 mb-4">
                     <Image
-                        src={imageError ? "/placeholder-scarf.jpg" : image}
+                        src={imageError ? "https://images.unsplash.com/photo-1761839259488-2bdeeae794f5?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDF8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxfHx8ZW58MHx8fHx8" : image}
                         alt={name}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
