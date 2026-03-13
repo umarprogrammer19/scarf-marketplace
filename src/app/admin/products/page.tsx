@@ -1,157 +1,116 @@
-"use client";
+// src/app/admin/products/page.tsx
+import { db } from "@/db";
+import { products, categories } from "@/db/schema";
+import { desc, eq } from "drizzle-orm";
+import Link from "next/link";
+import { Plus, Edit, Trash2 } from "lucide-react";
+import { deleteProduct } from "./actions";
 
-import { ImagePlus, Loader2, AlertCircle } from "lucide-react";
-import { CldUploadWidget } from "next-cloudinary";
-import { useState } from "react";
-import { createProduct } from "./actions";
-
-export default function ProductsPage() {
-    const [imageUrl, setImageUrl] = useState("");
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [error, setError] = useState("");
-    const [success, setSuccess] = useState(false);
-
-    const categories = [{ id: 1, name: "Premium Silk" }, { id: 2, name: "Summer Lawn" }];
-
-    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-        e.preventDefault();
-        setError("");
-        setSuccess(false);
-
-        if (!imageUrl) {
-            setError("Please upload an image first!");
-            return;
-        }
-
-        setIsSubmitting(true);
-        const formData = new FormData(e.currentTarget);
-
-        try {
-            await createProduct({
-                name: formData.get("name") as string,
-                categoryId: Number(formData.get("categoryId")),
-                description: formData.get("description") as string,
-                price: formData.get("price") as string,
-                stockQuantity: Number(formData.get("stockQuantity")),
-                isNew: formData.get("isNew") === "on",
-                isOnSale: formData.get("isOnSale") === "on",
-                imageUrl: imageUrl,
-            });
-
-            setSuccess(true);
-            setImageUrl("");
-            (e.target as HTMLFormElement).reset();
-
-            // Clear success message after 3 seconds
-            setTimeout(() => setSuccess(false), 3000);
-        } catch (err) {
-            setError("Failed to add product. Please try again.");
-        } finally {
-            setIsSubmitting(false);
-        }
-    }
+export default async function AdminProductsList() {
+    // Fetch products and join with categories to get the category name
+    const allProducts = await db
+        .select({
+            id: products.id,
+            name: products.name,
+            price: products.price,
+            stockQuantity: products.stockQuantity,
+            imageUrl: products.imageUrl,
+            isNew: products.isNew,
+            isOnSale: products.isOnSale,
+            categoryName: categories.name,
+        })
+        .from(products)
+        .leftJoin(categories, eq(products.categoryId, categories.id))
+        .orderBy(desc(products.createdAt));
 
     return (
-        <div className="max-w-4xl">
-            <div className="mb-8">
-                <h1 className="text-4xl font-bold text-foreground mb-2">Add New Product</h1>
-                <p className="text-muted-foreground">Create a new premium scarf listing</p>
+        <div className="max-w-6xl mx-auto">
+            <div className="flex justify-between items-center mb-8">
+                <div>
+                    <h1 className="text-3xl font-serif text-foreground mb-2">Inventory Management</h1>
+                    <p className="text-muted-foreground">Manage your scarf catalog, pricing, and stock.</p>
+                </div>
+                <Link
+                    href="/admin/products/new"
+                    className="flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-lg font-bold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20"
+                >
+                    <Plus size={20} /> Add New Product
+                </Link>
             </div>
 
-            {/* Success Message */}
-            {success && (
-                <div className="mb-6 p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
-                    <p className="text-green-500 font-medium">Product added successfully!</p>
-                </div>
-            )}
+            <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-2xl">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse min-w-200">
+                        <thead>
+                            <tr className="border-b border-border bg-secondary/50">
+                                <th className="p-4 text-xs font-bold tracking-widest text-muted-foreground uppercase">Product</th>
+                                <th className="p-4 text-xs font-bold tracking-widest text-muted-foreground uppercase">Category</th>
+                                <th className="p-4 text-xs font-bold tracking-widest text-muted-foreground uppercase">Price</th>
+                                <th className="p-4 text-xs font-bold tracking-widest text-muted-foreground uppercase">Stock</th>
+                                <th className="p-4 text-xs font-bold tracking-widest text-muted-foreground uppercase">Status</th>
+                                <th className="p-4 text-xs font-bold tracking-widest text-muted-foreground uppercase text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-border">
+                            {allProducts.length === 0 ? (
+                                <tr>
+                                    <td colSpan={6} className="p-12 text-center text-muted-foreground">
+                                        No products found. Click "Add New Product" to start building your catalog.
+                                    </td>
+                                </tr>
+                            ) : (
+                                allProducts.map((product) => (
+                                    <tr key={product.id} className="hover:bg-secondary/20 transition-colors">
+                                        <td className="p-4">
+                                            <div className="flex items-center gap-4">
+                                                <img src={product.imageUrl} alt={product.name} className="w-12 h-16 object-cover rounded-md border border-border" />
+                                                <span className="font-semibold text-foreground line-clamp-1">{product.name}</span>
+                                            </div>
+                                        </td>
+                                        <td className="p-4 text-muted-foreground">{product.categoryName}</td>
+                                        <td className="p-4 font-medium text-primary">Rs. {Number(product.price).toLocaleString()}</td>
+                                        <td className="p-4">
+                                            <span className={`px-3 py-1 rounded-full text-xs font-bold ${product.stockQuantity > 0 ? 'bg-green-500/10 text-green-500' : 'bg-destructive/10 text-destructive'}`}>
+                                                {product.stockQuantity} in stock
+                                            </span>
+                                        </td>
+                                        <td className="p-4">
+                                            <div className="flex gap-2">
+                                                {product.isNew && <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-1 border border-primary/50 text-primary rounded-full">New</span>}
+                                                {product.isOnSale && <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-1 border border-destructive/50 text-destructive rounded-full">Sale</span>}
+                                            </div>
+                                        </td>
+                                        <td className="p-4 text-right">
+                                            <div className="flex items-center justify-end gap-3">
+                                                <Link
+                                                    href={`/admin/products/${product.id}/edit`}
+                                                    className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                                                    title="Edit Product"
+                                                >
+                                                    <Edit size={18} />
+                                                </Link>
 
-            {/* Error Message */}
-            {error && (
-                <div className="mb-6 p-4 bg-destructive/10 border border-destructive/30 rounded-lg flex items-center gap-3">
-                    <AlertCircle size={20} className="text-destructive shrink-0" />
-                    <p className="text-destructive">{error}</p>
-                </div>
-            )}
-
-            <div className="bg-card p-8 rounded-xl border border-border">
-                <form onSubmit={handleSubmit} className="space-y-6">
-
-                    {/* Image Upload Area */}
-                    <div>
-                        <label className="block text-sm font-semibold text-foreground mb-3">Product Image</label>
-                        <CldUploadWidget
-                            uploadPreset="ml_default"
-                            onSuccess={(result: any) => setImageUrl(result.info.secure_url)}
-                        >
-                            {({ open }) => (
-                                <div
-                                    onClick={() => open()}
-                                    className={`border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer transition-all ${imageUrl ? 'border-primary bg-primary/10' : 'border-border hover:border-primary hover:bg-secondary/30'}`}
-                                >
-                                    {imageUrl ? (
-                                        <img src={imageUrl} alt="Uploaded scarf" className="h-40 object-cover rounded-lg" />
-                                    ) : (
-                                        <>
-                                            <ImagePlus size={40} className="text-muted-foreground mb-4" />
-                                            <p className="text-foreground font-medium">Click to upload scarf image</p>
-                                            <p className="text-muted-foreground text-sm mt-1">PNG, JPG up to 10MB</p>
-                                        </>
-                                    )}
-                                </div>
+                                                {/* Delete Button (Using Server Action) */}
+                                                <form action={async () => {
+                                                    "use server";
+                                                    await deleteProduct(product.id);
+                                                }}>
+                                                    <button
+                                                        type="submit"
+                                                        className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
+                                                        title="Delete Product"
+                                                    >
+                                                        <Trash2 size={18} />
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
                             )}
-                        </CldUploadWidget>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label className="block text-sm font-semibold text-foreground mb-2">Product Name</label>
-                            <input type="text" name="name" required className="w-full bg-secondary border border-border rounded-lg px-4 py-2 text-foreground placeholder-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-colors" placeholder="e.g., Midnight Blue Silk" />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-semibold text-foreground mb-2">Category</label>
-                            <select name="categoryId" required className="w-full bg-secondary border border-border rounded-lg px-4 py-2 text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-colors">
-                                {categories.map(cat => (
-                                    <option key={cat.id} value={cat.id}>{cat.name}</option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-semibold text-foreground mb-2">Price (Rs.)</label>
-                            <input type="number" name="price" step="0.01" required className="w-full bg-secondary border border-border rounded-lg px-4 py-2 text-foreground placeholder-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-colors" placeholder="2500.00" />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-semibold text-foreground mb-2">Stock Quantity</label>
-                            <input type="number" name="stockQuantity" required className="w-full bg-secondary border border-border rounded-lg px-4 py-2 text-foreground placeholder-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-colors" placeholder="50" />
-                        </div>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-semibold text-foreground mb-2">Description</label>
-                        <textarea name="description" required rows={4} className="w-full bg-secondary border border-border rounded-lg px-4 py-2 text-foreground placeholder-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-colors resize-none" placeholder="Describe the fabric, dimensions, and feel..." />
-                    </div>
-
-                    <div className="space-y-3 border-t border-border pt-6">
-                        <label className="flex items-center gap-3 cursor-pointer group">
-                            <input type="checkbox" name="isNew" className="w-5 h-5 accent-primary rounded" />
-                            <span className="text-foreground font-medium group-hover:text-primary transition-colors">Mark as "New Arrival"</span>
-                        </label>
-                        <label className="flex items-center gap-3 cursor-pointer group">
-                            <input type="checkbox" name="isOnSale" className="w-5 h-5 accent-primary rounded" />
-                            <span className="text-foreground font-medium group-hover:text-primary transition-colors">Mark as "On Sale"</span>
-                        </label>
-                    </div>
-
-                    <button
-                        type="submit"
-                        disabled={isSubmitting || !imageUrl}
-                        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-3 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                    >
-                        {isSubmitting ? <Loader2 className="animate-spin" size={20} /> : 'Save Product to Database'}
-                    </button>
-                </form>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );
