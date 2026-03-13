@@ -1,11 +1,11 @@
+import AddToCartButton from "@/components/storefront/AddToCartButton";
+import Navbar from "@/components/storefront/Navbar";
 import { db } from "@/db";
 import { products } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { notFound } from "next/navigation";
+import { ArrowLeft, ShieldCheck, Truck } from "lucide-react";
 import Link from "next/link";
-import Navbar from "@/components/storefront/Navbar";
-import { ArrowLeft, ShoppingBag, ShieldCheck, Truck } from "lucide-react";
-import AddToCartButton from "@/components/storefront/AddToCartButton";
+import { notFound } from "next/navigation";
 
 interface ProductPageProps {
     params: {

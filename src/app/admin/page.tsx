@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { TrendingUp, ShoppingBag, Package, DollarSign, Users, AlertCircle } from "lucide-react";
+import { AlertCircle, DollarSign, Package, ShoppingBag, Users } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 interface DashboardStats {
     totalSales: number;
