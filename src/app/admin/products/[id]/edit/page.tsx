@@ -1,4 +1,3 @@
-// src/app/admin/products/[id]/edit/page.tsx
 import { db } from "@/db";
 import { products, categories } from "@/db/schema";
 import { eq } from "drizzle-orm";
@@ -7,12 +6,21 @@ import EditForm from "./EditForm";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
-export default async function EditProductPage({ params }: { params: { id: string } }) {
-    // Fetch the specific product
+// 1. Update the type to reflect that params is a Promise
+export default async function EditProductPage({
+    params
+}: {
+    params: Promise<{ id: string }>
+}) {
+    // 2. Await the params before using them!
+    const resolvedParams = await params;
+    const productId = Number(resolvedParams.id);
+
+    // Fetch the specific product using the resolved ID
     const productData = await db
         .select()
         .from(products)
-        .where(eq(products.id, Number(params.id)))
+        .where(eq(products.id, productId))
         .limit(1);
 
     const product = productData[0];
