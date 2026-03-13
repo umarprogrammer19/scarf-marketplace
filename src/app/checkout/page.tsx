@@ -4,8 +4,9 @@ import { useCartStore } from "@/store/cartStore";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { placeCODOrder } from "./actions";
-import { Loader2, Truck, ShieldCheck } from "lucide-react";
+import { Loader2, Truck, ShieldCheck, ArrowLeft, Check } from "lucide-react";
 import Navbar from "@/components/storefront/Navbar";
+import Image from "next/image";
 
 export default function CheckoutPage() {
     const { items, getCartTotal, clearCart } = useCartStore();
@@ -17,28 +18,30 @@ export default function CheckoutPage() {
 
     if (!mounted) return null;
 
-    // If they somehow reach checkout with an empty cart, send them back
     if (items.length === 0) {
         router.push("/cart");
         return null;
     }
+
+    const subtotal = getCartTotal();
+    const tax = Math.round(subtotal * 0.05);
+    const total = subtotal + tax;
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         setIsSubmitting(true);
 
         const formData = new FormData(e.currentTarget);
-        const cartItemsPayload = items.map(item => ({
+        const cartItemsPayload = items.map((item) => ({
             id: item.id,
             quantity: item.quantity,
-            price: item.price
+            price: item.price,
         }));
 
-        const result = await placeCODOrder(formData, cartItemsPayload, getCartTotal());
+        const result = await placeCODOrder(formData, cartItemsPayload, total);
 
         if (result.success) {
-            clearCart(); // Empty their cart
-            // We will route them to a success page with their Order Number!
+            clearCart();
             router.push(`/checkout/success?order=${result.orderNumber}`);
         } else {
             alert("Something went wrong. Please try again.");
@@ -47,85 +50,223 @@ export default function CheckoutPage() {
     }
 
     return (
-        <div className="min-h-screen flex flex-col bg-background">
+        <div className="min-h-screen bg-background">
             <Navbar />
 
-            <main className="flex-1 container mx-auto px-4 py-12 max-w-6xl">
-                <h1 className="text-4xl font-serif text-text-main mb-10">Secure Checkout</h1>
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                {/* Header */}
+                <button
+                    onClick={() => router.back()}
+                    className="inline-flex items-center gap-2 text-primary hover:text-primary/80 font-medium mb-8 transition-colors"
+                >
+                    <ArrowLeft size={20} />
+                    Back
+                </button>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div className="mb-12">
+                    <h1 className="text-4xl sm:text-5xl font-bold text-foreground">
+                        Secure Checkout
+                    </h1>
+                    <p className="text-muted-foreground mt-2">
+                        Complete your order with Cash on Delivery
+                    </p>
+                </div>
 
-                    {/* Left: The COD Form */}
-                    <div className="bg-surface p-8 rounded-2xl border border-gray-800">
-                        <h2 className="text-2xl font-serif text-gold mb-6 flex items-center gap-2">
-                            <Truck size={24} /> Shipping Details (COD Only)
-                        </h2>
-
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* Checkout Form */}
+                    <div className="lg:col-span-2">
                         <form onSubmit={handleSubmit} className="space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label className="block text-sm text-text-muted mb-2">Full Name</label>
-                                    <input type="text" name="customerName" required className="w-full bg-background border border-gray-800 rounded-lg px-4 py-3 text-text-main focus:border-gold outline-none" placeholder="Ammar" />
+                            {/* Shipping Details Section */}
+                            <div className="bg-secondary/40 border border-border rounded-xl p-8 space-y-6">
+                                <div className="flex items-center gap-3 pb-6 border-b border-border">
+                                    <div className="shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                        <Truck size={20} className="text-primary" />
+                                    </div>
+                                    <h2 className="text-xl font-bold text-foreground">
+                                        Delivery Details
+                                    </h2>
                                 </div>
-                                <div>
-                                    <label className="block text-sm text-text-muted mb-2">Phone Number</label>
-                                    <input type="tel" name="customerPhone" required className="w-full bg-background border border-gray-800 rounded-lg px-4 py-3 text-text-main focus:border-gold outline-none" placeholder="0300 1234567" />
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="block text-sm font-medium text-foreground">
+                                            Full Name <span className="text-red-500">*</span>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="customerName"
+                                            required
+                                            className="w-full bg-background border border-border rounded-lg px-4 py-3 text-foreground placeholder-muted-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                                            placeholder="Ammar Khan"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="block text-sm font-medium text-foreground">
+                                            Phone Number <span className="text-red-500">*</span>
+                                        </label>
+                                        <input
+                                            type="tel"
+                                            name="customerPhone"
+                                            required
+                                            className="w-full bg-background border border-border rounded-lg px-4 py-3 text-foreground placeholder-muted-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                                            placeholder="0300 1234567"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="block text-sm font-medium text-foreground">
+                                        Complete Delivery Address <span className="text-red-500">*</span>
+                                    </label>
+                                    <textarea
+                                        name="shippingAddress"
+                                        required
+                                        rows={3}
+                                        className="w-full bg-background border border-border rounded-lg px-4 py-3 text-foreground placeholder-muted-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none resize-none transition-all"
+                                        placeholder="House/Apt No, Street Name, Area..."
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="block text-sm font-medium text-foreground">
+                                        City <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="city"
+                                        required
+                                        className="w-full bg-background border border-border rounded-lg px-4 py-3 text-foreground placeholder-muted-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                                        placeholder="Karachi"
+                                    />
                                 </div>
                             </div>
 
-                            <div>
-                                <label className="block text-sm text-text-muted mb-2">Complete Delivery Address</label>
-                                <textarea name="shippingAddress" required rows={3} className="w-full bg-background border border-gray-800 rounded-lg px-4 py-3 text-text-main focus:border-gold outline-none" placeholder="House/Apt No, Street, Area..." />
-                            </div>
+                            {/* Payment Method Section */}
+                            <div className="bg-secondary/40 border border-border rounded-xl p-8 space-y-6">
+                                <div className="flex items-center gap-3 pb-6 border-b border-border">
+                                    <div className="shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                        <ShieldCheck size={20} className="text-primary" />
+                                    </div>
+                                    <h2 className="text-xl font-bold text-foreground">
+                                        Payment Method
+                                    </h2>
+                                </div>
 
-                            <div>
-                                <label className="block text-sm text-text-muted mb-2">City</label>
-                                <input type="text" name="city" required className="w-full bg-background border border-gray-800 rounded-lg px-4 py-3 text-text-main focus:border-gold outline-none" placeholder="Karachi" />
-                            </div>
-
-                            <div className="bg-background/50 p-4 rounded-xl border border-gray-800 flex items-start gap-3 mt-6">
-                                <ShieldCheck size={24} className="text-gold shrink-0 mt-1" />
-                                <div>
-                                    <p className="font-medium text-text-main">Cash on Delivery</p>
-                                    <p className="text-sm text-text-muted">You will pay in cash when the rider delivers your package to your doorstep.</p>
+                                <div className="p-4 bg-primary/10 border border-primary/30 rounded-lg flex items-start gap-3">
+                                    <Check size={20} className="text-primary shrink-0 mt-1" />
+                                    <div>
+                                        <p className="font-semibold text-foreground">
+                                            Cash on Delivery (COD)
+                                        </p>
+                                        <p className="text-sm text-muted-foreground mt-1">
+                                            Pay securely when the rider delivers your package to your doorstep. No upfront payment required.
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
 
+                            {/* Submit Button */}
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="w-full bg-gold hover:bg-gold-hover text-background font-bold text-lg py-4 rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50 mt-8"
+                                className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-primary-foreground font-bold text-lg py-4 rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 flex items-center justify-center gap-2"
                             >
-                                {isSubmitting ? <Loader2 className="animate-spin" /> : `Confirm Order - Rs. ${getCartTotal().toLocaleString()}`}
+                                {isSubmitting ? (
+                                    <>
+                                        <Loader2 className="animate-spin" size={20} />
+                                        Processing...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Check size={20} />
+                                        Confirm Order - Rs. {total.toLocaleString()}
+                                    </>
+                                )}
                             </button>
                         </form>
                     </div>
 
-                    {/* Right: Order Review */}
-                    <div className="bg-surface p-8 rounded-2xl border border-gray-800 h-fit sticky top-28">
-                        <h2 className="text-2xl font-serif text-text-main mb-6">Order Review</h2>
+                    {/* Order Summary Sidebar */}
+                    <div className="lg:col-span-1">
+                        <div className="bg-secondary/40 border border-border rounded-xl p-6 lg:p-8 sticky top-24 space-y-6">
+                            <h2 className="text-2xl font-bold text-foreground">Order Summary</h2>
 
-                        <div className="space-y-4 mb-6 max-h-100 overflow-y-auto pr-2">
-                            {items.map(item => (
-                                <div key={item.id} className="flex gap-4 items-center pb-4 border-b border-gray-800 last:border-0">
-                                    <img src={item.imageUrl} alt={item.name} className="w-16 h-16 object-cover rounded-lg" />
-                                    <div className="flex-1">
-                                        <p className="font-medium text-text-main line-clamp-1">{item.name}</p>
-                                        <p className="text-sm text-text-muted">Qty: {item.quantity}</p>
+                            {/* Items */}
+                            <div className="space-y-4 max-h-96 overflow-y-auto pr-2 border-b border-border pb-6">
+                                {items.map((item) => (
+                                    <div key={item.id} className="flex gap-3 items-start">
+                                        <div className="relative w-12 h-16 shrink-0 rounded-lg overflow-hidden bg-secondary">
+                                            <Image
+                                                src={item.imageUrl}
+                                                alt={item.name}
+                                                fill
+                                                className="object-cover"
+                                            />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="font-medium text-foreground line-clamp-1 text-sm">
+                                                {item.name}
+                                            </p>
+                                            <p className="text-xs text-muted-foreground">
+                                                Qty: {item.quantity}
+                                            </p>
+                                            <p className="text-sm font-semibold text-primary mt-1">
+                                                Rs. {(Number(item.price) * item.quantity).toLocaleString()}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <p className="font-bold text-gold">Rs. {(Number(item.price) * item.quantity).toLocaleString()}</p>
-                                </div>
-                            ))}
-                        </div>
+                                ))}
+                            </div>
 
-                        <div className="border-t border-gray-800 pt-6">
-                            <div className="flex justify-between items-center text-lg font-bold text-text-main">
-                                <span>Total to Pay (COD)</span>
-                                <span className="text-2xl text-gold">Rs. {getCartTotal().toLocaleString()}</span>
+                            {/* Price Breakdown */}
+                            <div className="space-y-3">
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-muted-foreground">Subtotal</span>
+                                    <span className="text-foreground font-medium">
+                                        Rs. {subtotal.toLocaleString()}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-muted-foreground">Tax (5%)</span>
+                                    <span className="text-foreground font-medium">
+                                        Rs. {tax.toLocaleString()}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-muted-foreground">Shipping</span>
+                                    <span className="text-primary font-medium">Free</span>
+                                </div>
+                            </div>
+
+                            {/* Total */}
+                            <div className="pt-3 border-t border-border">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-lg font-semibold text-foreground">
+                                        Total
+                                    </span>
+                                    <span className="text-2xl font-bold text-primary">
+                                        Rs. {total.toLocaleString()}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Trust Badges */}
+                            <div className="space-y-2 pt-6 border-t border-border">
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                    <ShieldCheck size={16} className="text-primary" />
+                                    100% Secure Payment
+                                </div>
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                    <Check size={16} className="text-primary" />
+                                    Guaranteed Authentic
+                                </div>
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                    <Truck size={16} className="text-primary" />
+                                    Fast Delivery
+                                </div>
                             </div>
                         </div>
                     </div>
-
                 </div>
             </main>
         </div>
