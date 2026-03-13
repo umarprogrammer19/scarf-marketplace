@@ -111,3 +111,9 @@
 body {
   font-family: sans-serif;
 }
+
+button,
+select,
+option {
+  cursor: pointer !important;
+}

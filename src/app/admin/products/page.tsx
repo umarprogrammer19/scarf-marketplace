@@ -1,4 +1,3 @@
-// src/app/admin/products/page.tsx
 import { db } from "@/db";
 import { products, categories } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";

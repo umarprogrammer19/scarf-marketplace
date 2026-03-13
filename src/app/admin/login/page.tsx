@@ -1,6 +1,5 @@
 import { signIn } from "@/auth";
-import { Lock, Mail, ArrowRight, User } from "lucide-react";
-import Image from "next/image";
+import { ArrowRight, Lock, Mail, User } from "lucide-react";
 
 export default function LoginPage() {
     async function handleLogin(formData: FormData) {
