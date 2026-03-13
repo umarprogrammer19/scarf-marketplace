@@ -32,7 +32,7 @@ export default function ProductCard({
     const [imageError, setImageError] = useState(false);
 
     return (
-        <Link href={`/product/${id}`}>
+        <Link href={`/product/${slug}`}>
             <div className="group cursor-pointer">
                 {/* Image Container */}
                 <div className="relative overflow-hidden rounded-xl bg-secondary h-64 sm:h-72 mb-4">
