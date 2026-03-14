@@ -35,7 +35,7 @@ export default function ProductCard({
             {/* Editorial Image Container */}
             <div className="relative aspect-4/5 overflow-hidden rounded-xl bg-secondary/30 mb-5">
                 <Image
-                    src={imageError ? "https://images.unsplash.com/photo-1606240228302-393282496a60?auto=format&fit=crop&q=80" : image}
+                    src={imageError ? "https://images.unsplash.com/photo-1771030668418-390b3edf33e4?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxNHx8fGVufDB8fHx8fA%3D%3D" : image}
                     alt={name}
                     fill
                     className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
