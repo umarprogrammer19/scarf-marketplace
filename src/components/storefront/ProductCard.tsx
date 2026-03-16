@@ -2,116 +2,193 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Star, Heart, ShoppingBag } from "lucide-react";
-import { useState } from "react";
+import { Heart, ShoppingBag } from "lucide-react";
+import { useState, useRef, useEffect, useCallback } from "react";
 
 interface ProductCardProps {
     id: string;
     name: string;
     price: number;
+    originalPrice?: number;
     image: string;
     isNew?: boolean;
     isOnSale?: boolean;
-    rating?: number;
-    onAddToCart?: () => void;
+    isBestSeller?: boolean;
     slug: string;
+    material?: string;
 }
 
 export default function ProductCard({
     name,
     price,
+    originalPrice,
     image,
     isNew,
     isOnSale,
-    rating = 5,
-    onAddToCart,
-    slug
+    isBestSeller,
+    slug,
+    material,
 }: ProductCardProps) {
     const [isWishlisted, setIsWishlisted] = useState(false);
-    const [imageError, setImageError] = useState(false);
+    const [isVisible, setIsVisible] = useState(false);
+    const cardRef = useRef<HTMLAnchorElement>(null);
+    const tiltRef = useRef<HTMLDivElement>(null);
+
+    // Scroll reveal
+    useEffect(() => {
+        const el = cardRef.current;
+        if (!el) return;
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsVisible(true);
+                    observer.unobserve(el);
+                }
+            },
+            { threshold: 0.15 }
+        );
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, []);
+
+    // 3D tilt
+    const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+        const el = tiltRef.current;
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = ((y - centerY) / centerY) * -6;
+        const rotateY = ((x - centerX) / centerX) * 6;
+        el.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+    }, []);
+
+    const handleMouseLeave = useCallback(() => {
+        const el = tiltRef.current;
+        if (!el) return;
+        el.style.transform = "perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)";
+    }, []);
 
     return (
-        <Link href={`/product/${slug}`} className="group block cursor-pointer">
-            {/* Editorial Image Container */}
-            <div className="relative aspect-4/5 overflow-hidden rounded-xl bg-secondary/30 mb-5">
-                <Image
-                    src={imageError ? "https://images.unsplash.com/photo-1606240228302-393282496a60?auto=format&fit=crop&q=80" : image}
-                    alt={name}
-                    fill
-                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
-                    onError={() => setImageError(true)}
-                />
+        <Link
+            ref={cardRef}
+            href={`/product/${slug}`}
+            className={`group block transition-all duration-700 ease-out ${
+                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
+            }`}
+        >
+            <div
+                ref={tiltRef}
+                onMouseMove={handleMouseMove}
+                onMouseLeave={handleMouseLeave}
+                className="relative rounded-2xl bg-[#111111] border border-white/[0.06] overflow-hidden transition-all duration-500 ease-out will-change-transform group-hover:border-primary/20 group-hover:shadow-[0_8px_40px_rgba(212,175,55,0.08)]"
+                style={{ transformStyle: "preserve-3d" }}
+            >
+                {/* Image */}
+                <div className="relative aspect-[3/4] overflow-hidden bg-[#0e0e0e]">
+                    <Image
+                        src={image}
+                        alt={name}
+                        fill
+                        className="object-cover transition-all duration-700 ease-out group-hover:scale-110 group-hover:brightness-110"
+                    />
 
-                {/* Subtle Gradient Overlay on Hover for Text Contrast */}
-                <div className="absolute inset-0 bg-linear-to-t from-background/80 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                    {/* Gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#111111] via-transparent to-transparent opacity-60" />
 
-                {/* Minimalist Top Badges & Actions */}
-                <div className="absolute top-4 left-4 right-4 flex items-start justify-between z-10">
-                    <div className="flex flex-col gap-2">
+                    {/* Shine sweep on hover */}
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none bg-[linear-gradient(105deg,transparent_40%,rgba(255,255,255,0.05)_45%,rgba(255,255,255,0.1)_50%,rgba(255,255,255,0.05)_55%,transparent_60%)] group-hover:translate-x-full" />
+
+                    {/* Badges */}
+                    <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
+                        {isBestSeller && (
+                            <span className="backdrop-blur-md bg-primary/90 text-black text-[9px] font-bold tracking-[0.12em] px-3 py-1 uppercase rounded-full">
+                                Best Seller
+                            </span>
+                        )}
                         {isNew && (
-                            <span className="bg-primary text-primary-foreground text-[10px] font-bold tracking-widest px-3 py-1 rounded-full uppercase shadow-lg">
+                            <span className="backdrop-blur-md bg-primary/90 text-black text-[9px] font-bold tracking-[0.12em] px-3 py-1 uppercase rounded-full">
                                 New
                             </span>
                         )}
                         {isOnSale && (
-                            <span className="bg-destructive text-destructive-foreground text-[10px] font-bold tracking-widest px-3 py-1 rounded-full uppercase shadow-lg">
+                            <span className="backdrop-blur-md bg-red-500/90 text-white text-[9px] font-bold tracking-[0.12em] px-3 py-1 uppercase rounded-full">
                                 Sale
                             </span>
                         )}
                     </div>
 
-                    <button
-                        onClick={(e) => {
-                            e.preventDefault();
-                            setIsWishlisted(!isWishlisted);
-                        }}
-                        className="flex items-center justify-center w-10 h-10 rounded-full bg-background/50 backdrop-blur-md text-foreground hover:bg-primary hover:text-primary-foreground transition-all duration-300 shadow-lg"
-                    >
-                        <Heart size={18} className={isWishlisted ? "fill-current text-primary" : ""} />
-                    </button>
+                    {/* Action buttons - top right */}
+                    <div className="absolute top-3 right-3 flex flex-col gap-2 z-10 translate-x-12 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300">
+                        <button
+                            onClick={(e) => {
+                                e.preventDefault();
+                                setIsWishlisted(!isWishlisted);
+                            }}
+                            className="p-2.5 rounded-full bg-black/50 backdrop-blur-md border border-white/10 hover:bg-black/70 hover:border-primary/30 transition-all duration-200"
+                        >
+                            <Heart
+                                size={14}
+                                className={`transition-colors ${isWishlisted ? "fill-red-500 text-red-500" : "text-white/80"}`}
+                            />
+                        </button>
+                        <button
+                            onClick={(e) => e.preventDefault()}
+                            className="p-2.5 rounded-full bg-black/50 backdrop-blur-md border border-white/10 hover:bg-primary/20 hover:border-primary/30 transition-all duration-200"
+                        >
+                            <ShoppingBag size={14} className="text-white/80" />
+                        </button>
+                    </div>
+
+                    {/* Quick view bar at bottom of image */}
+                    <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out">
+                        <div className="bg-primary/90 backdrop-blur-md text-black text-center py-2 rounded-lg text-[10px] font-bold tracking-[0.15em] uppercase hover:bg-primary transition-colors">
+                            Quick View
+                        </div>
+                    </div>
                 </div>
 
-                {/* Sexy Slide-up 'Add to Cart' */}
-                <div className="absolute bottom-0 left-0 w-full translate-y-full opacity-0 transition-all duration-500 ease-out group-hover:translate-y-0 group-hover:opacity-100 z-10">
-                    <button
-                        onClick={(e) => {
-                            e.preventDefault();
-                            onAddToCart?.();
-                        }}
-                        className="w-full bg-primary/95 backdrop-blur-sm text-primary-foreground py-4 font-bold tracking-wider uppercase text-xs flex items-center justify-center gap-2 hover:bg-primary transition-colors"
-                    >
-                        <ShoppingBag size={16} />
-                        Quick Add
-                    </button>
-                </div>
-            </div>
+                {/* Info section */}
+                <div className="p-4 space-y-2.5">
+                    {/* Name + Material */}
+                    <div>
+                        <h3 className="text-[13px] font-semibold text-white/90 group-hover:text-primary transition-colors duration-300 line-clamp-1 tracking-wide">
+                            {name}
+                        </h3>
+                        {material && (
+                            <p className="text-[10px] text-white/30 mt-0.5 tracking-wider uppercase">{material}</p>
+                        )}
+                    </div>
 
-            {/* Understated Product Info */}
-            <div className="flex flex-col items-center text-center px-2">
-                <div className="flex items-center gap-1 mb-2">
-                    {[...Array(5)].map((_, i) => (
-                        <Star
-                            key={i}
-                            size={12}
-                            className={i < Math.round(rating) ? "fill-primary text-primary" : "text-muted"}
-                        />
-                    ))}
+                    {/* Price row */}
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <span className="text-base font-bold text-primary">
+                                ${price.toFixed(2)}
+                            </span>
+                            {originalPrice && (
+                                <span className="text-xs text-white/25 line-through">
+                                    ${originalPrice.toFixed(2)}
+                                </span>
+                            )}
+                        </div>
+
+                        {/* Rating dots / decorative */}
+                        <div className="flex items-center gap-0.5">
+                            {[...Array(5)].map((_, i) => (
+                                <div
+                                    key={i}
+                                    className={`w-1 h-1 rounded-full ${i < 4 ? "bg-primary/60" : "bg-white/10"}`}
+                                />
+                            ))}
+                        </div>
+                    </div>
                 </div>
 
-                <h3 className=" text-lg text-foreground group-hover:text-primary transition-colors line-clamp-1 mb-1">
-                    {name}
-                </h3>
-
-                <div className="flex items-center gap-3">
-                    <span className="text-md font-medium text-muted-foreground">
-                        Rs. {Math.round(price).toLocaleString()}
-                    </span>
-                    {isOnSale && (
-                        <span className="text-sm text-muted-foreground/50 line-through">
-                            Rs. {Math.round(price * 1.2).toLocaleString()}
-                        </span>
-                    )}
-                </div>
+                {/* Bottom glow line */}
+                <div className="h-[1px] bg-gradient-to-r from-transparent via-primary/0 to-transparent group-hover:via-primary/40 transition-all duration-500" />
             </div>
         </Link>
     );
