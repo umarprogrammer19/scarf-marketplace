@@ -6,6 +6,7 @@ import Link from "next/link";
 import Navbar from "@/components/storefront/Navbar";
 import Footer from "@/components/storefront/Footer";
 import { Heart, ShoppingCart, Truck, Shield, Star, ChevronRight } from "lucide-react";
+import { useCartStore } from "@/store/cartStore";
 
 // --- Mock data (replace with your DB fetch) ---
 const PRODUCT = {
@@ -67,6 +68,7 @@ export default function ProductDetailPage() {
     const [selectedColor, setSelectedColor] = useState(PRODUCT.colors[0]);
     const [quantity, setQuantity] = useState(1);
     const [isWishlisted, setIsWishlisted] = useState(false);
+    const addItem = useCartStore((state) => state.addItem);
 
     return (
         <div className="min-h-screen bg-[#0d0f14] text-white">
@@ -200,7 +202,19 @@ export default function ProductDetailPage() {
                             </div>
 
                             {/* Add to Cart */}
-                            <button className="w-full flex items-center justify-center gap-2 bg-[#c9a84c] text-black font-black text-xs tracking-[0.2em] uppercase py-4 rounded-lg hover:bg-[#e0bc6a] transition-all duration-300 hover:shadow-[0_0_25px_rgba(201,168,76,0.35)] mb-3">
+                            <button
+                                onClick={() => {
+                                    addItem({
+                                        id: Number(PRODUCT.id),
+                                        name: PRODUCT.name,
+                                        price: String(PRODUCT.price),
+                                        imageUrl: PRODUCT.images[0],
+                                        quantity: quantity,
+                                    });
+                                    alert(`${PRODUCT.name} added to cart!`);
+                                }}
+                                className="w-full flex items-center justify-center gap-2 bg-[#c9a84c] text-black font-black text-xs tracking-[0.2em] uppercase py-4 rounded-lg hover:bg-[#e0bc6a] transition-all duration-300 hover:shadow-[0_0_25px_rgba(201,168,76,0.35)] mb-3"
+                            >
                                 <ShoppingCart size={16} />
                                 Add to Cart
                             </button>

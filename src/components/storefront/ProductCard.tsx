@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Heart, ShoppingBag } from "lucide-react";
 import { useState, useRef, useEffect, useCallback } from "react";
+import { useCartStore } from "@/store/cartStore";
 
 interface ProductCardProps {
     id: string;
@@ -19,6 +20,7 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({
+    id,
     name,
     price,
     originalPrice,
@@ -29,6 +31,7 @@ export default function ProductCard({
     slug,
     material,
 }: ProductCardProps) {
+    const addItem = useCartStore((state) => state.addItem);
     const [isWishlisted, setIsWishlisted] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
     const cardRef = useRef<HTMLAnchorElement>(null);
@@ -135,7 +138,16 @@ export default function ProductCard({
                             />
                         </button>
                         <button
-                            onClick={(e) => e.preventDefault()}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                addItem({
+                                    id: Number(id),
+                                    name,
+                                    price: String(price),
+                                    imageUrl: image,
+                                    quantity: 1,
+                                });
+                            }}
                             className="p-2.5 rounded-full bg-black/50 backdrop-blur-md border border-white/10 hover:bg-primary/20 hover:border-primary/30 transition-all duration-200"
                         >
                             <ShoppingBag size={14} className="text-white/80" />
