@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Heart, ShoppingBag } from "lucide-react";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useCartStore } from "@/store/cartStore";
+import { useWishlistStore } from "@/store/wishlistStore";
 
 interface ProductCardProps {
     id: string;
@@ -32,7 +33,8 @@ export default function ProductCard({
     material,
 }: ProductCardProps) {
     const addItem = useCartStore((state) => state.addItem);
-    const [isWishlisted, setIsWishlisted] = useState(false);
+    const { addItem: addToWishlist, removeItem: removeFromWishlist, isWishlisted } = useWishlistStore();
+    const wishlisted = isWishlisted(Number(id));
     const [isVisible, setIsVisible] = useState(false);
     const cardRef = useRef<HTMLAnchorElement>(null);
     const tiltRef = useRef<HTMLDivElement>(null);
@@ -128,13 +130,23 @@ export default function ProductCard({
                         <button
                             onClick={(e) => {
                                 e.preventDefault();
-                                setIsWishlisted(!isWishlisted);
+                                if (wishlisted) {
+                                    removeFromWishlist(Number(id));
+                                } else {
+                                    addToWishlist({
+                                        id: Number(id),
+                                        name,
+                                        price: String(price),
+                                        imageUrl: image,
+                                        slug,
+                                    });
+                                }
                             }}
                             className="p-2.5 rounded-full bg-black/50 backdrop-blur-md border border-white/10 hover:bg-black/70 hover:border-primary/30 transition-all duration-200"
                         >
                             <Heart
                                 size={14}
-                                className={`transition-colors ${isWishlisted ? "fill-red-500 text-red-500" : "text-white/80"}`}
+                                className={`transition-colors ${wishlisted ? "fill-red-500 text-red-500" : "text-white/80"}`}
                             />
                         </button>
                         <button

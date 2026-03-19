@@ -7,6 +7,7 @@ import Navbar from "@/components/storefront/Navbar";
 import Footer from "@/components/storefront/Footer";
 import { Heart, ShoppingCart, Truck, Shield, Star, ChevronRight } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
+import { useWishlistStore } from "@/store/wishlistStore";
 
 // --- Mock data (replace with your DB fetch) ---
 const PRODUCT = {
@@ -67,8 +68,9 @@ export default function ProductDetailPage() {
     const [selectedImage, setSelectedImage] = useState(0);
     const [selectedColor, setSelectedColor] = useState(PRODUCT.colors[0]);
     const [quantity, setQuantity] = useState(1);
-    const [isWishlisted, setIsWishlisted] = useState(false);
     const addItem = useCartStore((state) => state.addItem);
+    const { addItem: addToWishlist, removeItem: removeFromWishlist, isWishlisted } = useWishlistStore();
+    const wishlisted = isWishlisted(Number(PRODUCT.id));
 
     return (
         <div className="min-h-screen bg-[#0d0f14] text-white">
@@ -221,14 +223,26 @@ export default function ProductDetailPage() {
 
                             {/* Wishlist */}
                             <button
-                                onClick={() => setIsWishlisted(!isWishlisted)}
+                                onClick={() => {
+                                    if (wishlisted) {
+                                        removeFromWishlist(Number(PRODUCT.id));
+                                    } else {
+                                        addToWishlist({
+                                            id: Number(PRODUCT.id),
+                                            name: PRODUCT.name,
+                                            price: String(PRODUCT.price),
+                                            imageUrl: PRODUCT.images[0],
+                                            slug: PRODUCT.id,
+                                        });
+                                    }
+                                }}
                                 className="w-full flex items-center justify-center gap-2 border border-white/15 text-white/60 font-bold text-xs tracking-[0.15em] uppercase py-3.5 rounded-lg hover:border-white/30 hover:text-white transition-all mb-8"
                             >
                                 <Heart
                                     size={15}
-                                    className={isWishlisted ? "fill-red-500 text-red-500" : ""}
+                                    className={wishlisted ? "fill-red-500 text-red-500" : ""}
                                 />
-                                {isWishlisted ? "Saved to Wishlist" : "Add to Wishlist"}
+                                {wishlisted ? "Saved to Wishlist" : "Add to Wishlist"}
                             </button>
 
                             {/* Trust Badges */}
