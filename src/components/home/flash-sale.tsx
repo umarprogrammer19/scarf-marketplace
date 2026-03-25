@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { products } from "../../data/mockData";
-import ProductCard from "./ProductCard";
+import ProductCard from "../storefront/ProductCard";
 import { Timer } from "lucide-react";
 
 export default function FlashSale() {

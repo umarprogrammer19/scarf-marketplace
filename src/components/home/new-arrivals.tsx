@@ -1,5 +1,5 @@
 import { products } from "../../data/mockData";
-import ProductCard from "./ProductCard";
+import ProductCard from "../storefront/ProductCard";
 
 export default function NewArrivals() {
     const newArrivals = products.filter((p) => p.isNew).slice(0, 4);

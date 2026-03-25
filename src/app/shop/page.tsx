@@ -1,198 +1,203 @@
-"use client";
-
+"use client"
 import { useState } from "react";
-import Navbar from "@/components/storefront/Navbar";
-import Footer from "@/components/storefront/Footer";
+import { products } from "../../data/mockData";
+import { Search, SlidersHorizontal } from "lucide-react";
 import ProductCard from "@/components/storefront/ProductCard";
-import { SlidersHorizontal, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
-
-const PRODUCTS = [
-    { id: "1", slug: "midnight-botanical-silk", name: "Midnight Botanical Silk", material: "100% Mulberry Silk", price: 89, image: "https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=600&q=80", isBestSeller: true },
-    { id: "2", slug: "heritage-wool-wrap", name: "Heritage Wool Wrap", material: "Merino Wool Blend", price: 120, originalPrice: 150, image: "https://images.unsplash.com/photo-1601924994987-69e26d50dc26?auto=format&fit=crop&w=600&q=80", isOnSale: true },
-    { id: "3", slug: "cloud-touch-cashmere", name: "Cloud Touch Cashmere", material: "Premium Inner Mongolian Cashmere", price: 245, image: "https://images.unsplash.com/photo-1578632292335-df3abbb0d586?auto=format&fit=crop&w=600&q=80", isNew: true },
-    { id: "4", slug: "geometric-expression", name: "Geometric Expression", material: "Italian Silk Twill", price: 95, image: "https://images.unsplash.com/photo-1609709295948-17d77cb2a69b?auto=format&fit=crop&w=600&q=80" },
-    { id: "5", slug: "earthy-check-merino", name: "Earthy Check Merino", material: "Sustainable Wool", price: 65, image: "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?auto=format&fit=crop&w=600&q=80" },
-    { id: "6", slug: "highland-plaid", name: "Highland Plaid", material: "Brushed Wool", price: 78, image: "https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?auto=format&fit=crop&w=600&q=80", isNew: true },
-];
-
-const MATERIALS = ["Silk Collection", "Wool Blend", "Cashmere Luxe", "Linen Breeze"];
-const COLORS = ["#2d6a4f", "#c9a84c", "#1a3a5c", "#c94c4c", "#4c4cc9", "#e8e8e8"];
 
 export default function ShopPage() {
-    const [selectedMaterials, setSelectedMaterials] = useState<string[]>(["Cashmere Luxe"]);
-    const [selectedColor, setSelectedColor] = useState("#2d6a4f");
+    const [searchQuery, setSearchQuery] = useState("");
+    const [selectedCategory, setSelectedCategory] = useState("All");
+    const [priceRange, setPriceRange] = useState([0, 500]);
+    const [selectedColor, setSelectedColor] = useState("All");
     const [currentPage, setCurrentPage] = useState(1);
+    const [showFilters, setShowFilters] = useState(false);
 
-    const toggleMaterial = (m: string) => {
-        setSelectedMaterials((prev) =>
-            prev.includes(m) ? prev.filter((x) => x !== m) : [...prev, m]
-        );
-    };
+    const itemsPerPage = 9;
+
+    const categories = ["All", ...Array.from(new Set(products.map((p) => p.category)))];
+    const colors = ["All", ...Array.from(new Set(products.map((p) => p.color)))];
+
+    // Filter products
+    const filteredProducts = products.filter((product) => {
+        const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesCategory = selectedCategory === "All" || product.category === selectedCategory;
+        const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
+        const matchesColor = selectedColor === "All" || product.color === selectedColor;
+
+        return matchesSearch && matchesCategory && matchesPrice && matchesColor;
+    });
+
+    // Pagination
+    const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const displayedProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
 
     return (
-        <div className="min-h-screen bg-[#0d0f14] text-white">
-            <Navbar />
+        <div className="min-h-screen pt-20">
+            {/* Hero Section */}
+            <section className="relative py-20 px-4 sm:px-6 lg:px-8 bg-linear-to-b from-black to-black/50">
+                <div className="max-w-7xl mx-auto text-center">
+                    <h1 className="text-5xl md:text-6xl lg:text-7xl mb-6 text-white">
+                        Luxury Collection
+                    </h1>
+                    <p className="text-xl text-white/70 max-w-2xl mx-auto">
+                        Explore our exquisite range of handcrafted scarves
+                    </p>
+                </div>
+            </section>
 
-            <main className="pt-20 pb-16">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex gap-8">
-
-                        {/* ===== SIDEBAR ===== */}
-                        <aside className="hidden lg:block w-[200px] shrink-0 pt-8">
-                            {/* Filters heading */}
-                            <div className="flex items-center gap-2 mb-6">
-                                <SlidersHorizontal size={14} className="text-white/60" strokeWidth={2} />
-                                <span className="text-[11px] font-black tracking-[0.2em] uppercase text-white">
-                                    Filters
-                                </span>
-                            </div>
-
-                            {/* Material */}
-                            <div className="mb-7">
-                                <p className="text-[9px] font-black tracking-[0.2em] uppercase text-white/40 mb-3">
-                                    Material
-                                </p>
-                                <div className="space-y-2.5">
-                                    {MATERIALS.map((m) => (
-                                        <label key={m} className="flex items-center gap-2.5 cursor-pointer group">
-                                            <div
-                                                onClick={() => toggleMaterial(m)}
-                                                className={`w-4 h-4 rounded-sm border flex items-center justify-center transition-colors cursor-pointer ${
-                                                    selectedMaterials.includes(m)
-                                                        ? "bg-[#c9a84c] border-[#c9a84c]"
-                                                        : "border-white/20 bg-transparent"
-                                                }`}
-                                            >
-                                                {selectedMaterials.includes(m) && (
-                                                    <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                                                        <path d="M1 4L3.5 6.5L9 1" stroke="black" strokeWidth="1.5" strokeLinecap="round" />
-                                                    </svg>
-                                                )}
-                                            </div>
-                                            <span className="text-xs text-white/55 group-hover:text-white transition-colors">
-                                                {m}
-                                            </span>
-                                        </label>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Color */}
-                            <div className="mb-7">
-                                <p className="text-[9px] font-black tracking-[0.2em] uppercase text-white/40 mb-3">
-                                    Color
-                                </p>
-                                <div className="flex flex-wrap gap-2">
-                                    {COLORS.map((c) => (
-                                        <button
-                                            key={c}
-                                            onClick={() => setSelectedColor(c)}
-                                            className={`w-6 h-6 rounded-full transition-all ${
-                                                selectedColor === c
-                                                    ? "ring-2 ring-white ring-offset-2 ring-offset-[#0d0f14] scale-110"
-                                                    : "hover:scale-105"
-                                            }`}
-                                            style={{ backgroundColor: c }}
+            {/* Main Content */}
+            <section className="py-12 px-4 sm:px-6 lg:px-8">
+                <div className="max-w-7xl mx-auto">
+                    <div className="flex flex-col lg:flex-row gap-8">
+                        {/* Sidebar Filters - Desktop */}
+                        <aside className="hidden lg:block w-80 shrink-0">
+                            <div className="sticky top-24 space-y-6">
+                                {/* Search */}
+                                <div>
+                                    <label className="block text-white mb-3">Search</label>
+                                    <div className="relative">
+                                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
+                                        <input
+                                            type="text"
+                                            placeholder="Search products..."
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-gold transition-colors duration-300"
                                         />
-                                    ))}
+                                    </div>
                                 </div>
-                            </div>
 
-                            {/* Price Range */}
-                            <div className="mb-8">
-                                <p className="text-[9px] font-black tracking-[0.2em] uppercase text-white/40 mb-3">
-                                    Price Range
-                                </p>
-                                <div className="flex items-center justify-between mb-2">
-                                    <span className="text-[10px] bg-[#12172a] border border-[#2a3040] px-2 py-1 rounded text-white/60">$20</span>
-                                    <span className="text-[10px] bg-[#12172a] border border-[#2a3040] px-2 py-1 rounded text-white/60">$500+</span>
+                                {/* Category Filter */}
+                                <div>
+                                    <label className="block text-white mb-3">Category</label>
+                                    <div className="space-y-2">
+                                        {categories.map((category) => (
+                                            <button
+                                                key={category}
+                                                onClick={() => setSelectedCategory(category)}
+                                                className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-300 ${selectedCategory === category
+                                                        ? "bg-gold text-black font-semibold"
+                                                        : "bg-white/5 text-white/70 hover:bg-white/10 hover:text-white"
+                                                    }`}
+                                            >
+                                                {category}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
-                                <input
-                                    type="range"
-                                    min={20}
-                                    max={500}
-                                    defaultValue={300}
-                                    className="w-full accent-[#c9a84c] cursor-pointer"
-                                />
-                            </div>
 
-                            {/* Clear Filters */}
-                            <button
-                                onClick={() => { setSelectedMaterials([]); setSelectedColor(""); }}
-                                className="w-full border border-white/20 text-white/60 text-[10px] font-bold tracking-[0.15em] uppercase py-2.5 rounded hover:border-[#c9a84c] hover:text-[#c9a84c] transition-colors"
-                            >
-                                Clear All Filters
-                            </button>
+                                {/* Price Range */}
+                                <div>
+                                    <label className="block text-white mb-3">
+                                        Price Range: ${priceRange[0]} - ${priceRange[1]}
+                                    </label>
+                                    <input
+                                        type="range"
+                                        min="0"
+                                        max="500"
+                                        value={priceRange[1]}
+                                        onChange={(e) => setPriceRange([0, parseInt(e.target.value)])}
+                                        className="w-full accent-gold"
+                                    />
+                                </div>
+
+                                {/* Color Filter */}
+                                <div>
+                                    <label className="block text-white mb-3">Color</label>
+                                    <div className="space-y-2">
+                                        {colors.map((color) => (
+                                            <button
+                                                key={color}
+                                                onClick={() => setSelectedColor(color)}
+                                                className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-300 ${selectedColor === color
+                                                        ? "bg-gold text-black font-semibold"
+                                                        : "bg-white/5 text-white/70 hover:bg-white/10 hover:text-white"
+                                                    }`}
+                                            >
+                                                {color}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Reset Filters */}
+                                <button
+                                    onClick={() => {
+                                        setSearchQuery("");
+                                        setSelectedCategory("All");
+                                        setPriceRange([0, 500]);
+                                        setSelectedColor("All");
+                                    }}
+                                    className="w-full py-3 bg-white/5 border border-white/10 text-white rounded-lg hover:bg-white/10 hover:border-gold transition-all duration-300"
+                                >
+                                    Reset Filters
+                                </button>
+                            </div>
                         </aside>
 
-                        {/* ===== MAIN CONTENT ===== */}
-                        <div className="flex-1 pt-8">
-                            {/* Top bar */}
+                        {/* Mobile Filter Toggle */}
+                        <div className="lg:hidden">
+                            <button
+                                onClick={() => setShowFilters(!showFilters)}
+                                className="w-full py-3 bg-gold text-black font-semibold rounded-lg flex items-center justify-center space-x-2"
+                            >
+                                <SlidersHorizontal className="w-5 h-5" />
+                                <span>Filters</span>
+                            </button>
+                        </div>
+
+                        {/* Products Grid */}
+                        <div className="flex-1">
                             <div className="flex items-center justify-between mb-8">
-                                <p className="text-xs text-white/40">
-                                    Showing{" "}
-                                    <span className="text-white font-bold">24</span>{" "}
-                                    exclusive styles
+                                <p className="text-white/70">
+                                    Showing {displayedProducts.length} of {filteredProducts.length} products
                                 </p>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[10px] text-white/40 uppercase tracking-wider">Sort by:</span>
-                                    <button className="flex items-center gap-1.5 text-xs font-bold text-white hover:text-[#c9a84c] transition-colors">
-                                        Featured <ChevronDown size={13} />
-                                    </button>
-                                </div>
                             </div>
 
-                            {/* Product Grid — 3 columns */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-10">
-                                {PRODUCTS.map((product) => (
-                                    <ProductCard
-                                        key={product.id}
-                                        id={product.id}
-                                        slug={product.slug}
-                                        name={product.name}
-                                        material={product.material}
-                                        price={product.price}
-                                        originalPrice={(product as any).originalPrice}
-                                        image={product.image}
-                                        isNew={product.isNew}
-                                        isOnSale={product.isOnSale}
-                                        isBestSeller={(product as any).isBestSeller}
-                                    />
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                                {displayedProducts.map((product) => (
+                                    <ProductCard key={product.id} product={product} />
                                 ))}
                             </div>
 
                             {/* Pagination */}
-                            <div className="flex items-center justify-center gap-1.5 mt-14">
-                                <button className="w-8 h-8 flex items-center justify-center rounded border border-[#2a3040] text-white/40 hover:border-[#c9a84c] hover:text-[#c9a84c] transition-colors">
-                                    <ChevronLeft size={14} />
-                                </button>
-                                {[1, 2, 3].map((p) => (
+                            {totalPages > 1 && (
+                                <div className="flex justify-center items-center space-x-2">
                                     <button
-                                        key={p}
-                                        onClick={() => setCurrentPage(p)}
-                                        className={`w-8 h-8 flex items-center justify-center rounded text-xs font-bold transition-colors ${
-                                            currentPage === p
-                                                ? "bg-[#c9a84c] text-black"
-                                                : "border border-[#2a3040] text-white/40 hover:border-[#c9a84c] hover:text-[#c9a84c]"
-                                        }`}
+                                        onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                                        disabled={currentPage === 1}
+                                        className="px-4 py-2 bg-white/5 border border-white/10 text-white rounded-lg hover:bg-gold hover:text-black hover:border-gold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        {p}
+                                        Previous
                                     </button>
-                                ))}
-                                <span className="text-white/30 text-xs px-1">...</span>
-                                <button className="w-8 h-8 flex items-center justify-center rounded border border-[#2a3040] text-white/40 hover:border-[#c9a84c] hover:text-[#c9a84c] transition-colors text-xs font-bold">
-                                    12
-                                </button>
-                                <button className="w-8 h-8 flex items-center justify-center rounded border border-[#2a3040] text-white/40 hover:border-[#c9a84c] hover:text-[#c9a84c] transition-colors">
-                                    <ChevronRight size={14} />
-                                </button>
-                            </div>
+
+                                    {[...Array(totalPages)].map((_, i) => (
+                                        <button
+                                            key={i}
+                                            onClick={() => setCurrentPage(i + 1)}
+                                            className={`w-10 h-10 rounded-lg transition-all duration-300 ${currentPage === i + 1
+                                                    ? "bg-gold text-black font-semibold"
+                                                    : "bg-white/5 text-white hover:bg-white/10"
+                                                }`}
+                                        >
+                                            {i + 1}
+                                        </button>
+                                    ))}
+
+                                    <button
+                                        onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                                        disabled={currentPage === totalPages}
+                                        className="px-4 py-2 bg-white/5 border border-white/10 text-white rounded-lg hover:bg-gold hover:text-black hover:border-gold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        Next
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
-            </main>
-
-            <Footer />
+            </section>
         </div>
     );
 }
