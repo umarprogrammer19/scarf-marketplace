@@ -124,7 +124,7 @@ export const products: Product[] = [
         ],
         inStock: true,
         featured: true,
-        isFlashSale: true,
+        isFlashSale: false,
     },
     {
         id: '5',
@@ -174,6 +174,7 @@ export const products: Product[] = [
         ],
         inStock: true,
         featured: false,
+        isFlashSale: true,
     },
     {
         id: '8',

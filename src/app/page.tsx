@@ -1,3 +1,4 @@
+import FlashSale from "@/components/home/flash-sale";
 import Hero from "@/components/home/hero-section";
 import NewArrivals from "@/components/home/new-arrivals";
 import Footer from "@/components/storefront/Footer";
@@ -166,9 +167,9 @@ export default async function HomePage() {
                     </div>
                 </section>
             )} */}
-
+            <FlashSale />
             {/* ===== BRAND STORY ===== */}
-            <section className="py-20 md:py-24 border-t border-border">
+            {/* <section className="py-20 md:py-24 border-t border-border">
                 <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                     <ScrollReveal>
                         <div className="flex items-center justify-center gap-1 text-primary mb-5">
@@ -200,7 +201,7 @@ export default async function HomePage() {
                         ))}
                     </div>
                 </div>
-            </section>
+            </section> */}
 
             {/* ===== NEWSLETTER ===== */}
             <ScrollReveal>
