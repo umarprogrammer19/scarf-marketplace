@@ -1,3 +1,4 @@
+"use client"
 import { LayoutDashboard, Package, ShoppingCart, Users, Menu, X, LogOut } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
