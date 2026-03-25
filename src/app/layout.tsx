@@ -23,7 +23,7 @@ export default function RootLayout({
     <html lang="en" className={cn("font-sans", geist.variable)}>
       <body className={`font-sans antialiased bg-background text-text-main`}>
         <CartProvider>
-          {/* <Navbar /> */}
+          <Navbar />
           {children}
           <Toaster
             position="top-right"
@@ -36,7 +36,7 @@ export default function RootLayout({
               className: 'luxury-toast',
             }}
           />
-          {/* <Footer /> */}
+          <Footer />
         </CartProvider>
       </body>
     </html>
