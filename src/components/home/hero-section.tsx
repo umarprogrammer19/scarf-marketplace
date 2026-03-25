@@ -50,18 +50,7 @@ export default function Hero() {
                         Our Story
                     </Link>
                 </div>
-
-                {/* Scroll Indicator */}
-                <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2 animate-bounce">
-                    <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center pt-2">
-                        <div className="w-1 h-2 bg-gold rounded-full animate-pulse" />
-                    </div>
-                </div>
             </div>
-
-            {/* Decorative Elements */}
-            <div className="absolute top-20 left-10 w-20 h-20 border border-gold/20 rounded-full animate-pulse" />
-            <div className="absolute bottom-40 right-20 w-32 h-32 border border-gold/10 rounded-full animate-pulse delay-75" />
         </section>
     );
 }

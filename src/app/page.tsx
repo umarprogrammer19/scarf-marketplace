@@ -90,9 +90,8 @@ export default async function HomePage() {
             </section> */}
 
             {/* ===== 3D ROTATING CAROUSEL — Exclusive Collection ===== */}
-            {latestProducts.length > 0 && (
+            {/* {latestProducts.length > 0 && (
                 <section className="py-20 md:py-28 relative overflow-hidden">
-                    {/* Background glow */}
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-primary/[0.03] blur-[120px] pointer-events-none" />
 
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -110,7 +109,6 @@ export default async function HomePage() {
                             </div>
                         </ScrollReveal>
 
-                        {/* 3D Carousel */}
                         <ScrollReveal>
                             <div className="h-[380px] flex items-center justify-center">
                                 <ProductCarousel3D
@@ -137,7 +135,7 @@ export default async function HomePage() {
                         </div>
                     </div>
                 </section>
-            )}
+            )} */}
 
             {/* ===== PRODUCTS GRID ===== */}
             {latestProducts.length > 0 && (
