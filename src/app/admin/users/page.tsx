@@ -1,3 +1,4 @@
+"use client";
 import { useState } from "react";
 import { users } from "../../../data/mockData";
 import { Search, Filter, Mail, Calendar } from "lucide-react";
