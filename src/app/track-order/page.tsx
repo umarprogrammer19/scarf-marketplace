@@ -1,3 +1,4 @@
+"use client";
 import { useState } from "react";
 import { Search, Package, Truck, CheckCircle, Clock } from "lucide-react";
 import { orders } from "../../data/mockData";
@@ -38,7 +39,7 @@ export default function TrackOrderPage() {
     };
 
     return (
-        <div className="min-h-screen pt-20 pb-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen pt-20 pb-12 px-4 sm:px-6 lg:px-8 mt-10">
             <div className="max-w-4xl mx-auto">
                 <div className="text-center mb-12">
                     <h1 className="text-4xl md:text-5xl lg:text-6xl text-white mb-4">
