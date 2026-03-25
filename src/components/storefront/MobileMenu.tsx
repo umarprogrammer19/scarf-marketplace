@@ -1,5 +1,6 @@
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect } from "react";
-import { Link, useLocation } from "react-router";
 
 interface MobileMenuProps {
     isOpen: boolean;
@@ -7,7 +8,7 @@ interface MobileMenuProps {
 }
 
 export default function MobileMenu({ isOpen, navLinks }: MobileMenuProps) {
-    const location = useLocation();
+    const location = usePathname();
 
     useEffect(() => {
         if (isOpen) {
@@ -45,10 +46,10 @@ export default function MobileMenu({ isOpen, navLinks }: MobileMenuProps) {
                         {navLinks.map((link) => (
                             <Link
                                 key={link.path}
-                                to={link.path}
-                                className={`text-lg tracking-wide transition-colors duration-300 ${location.pathname === link.path
-                                        ? "text-gold"
-                                        : "text-white/80 hover:text-gold"
+                                href={link.path}
+                                className={`text-lg tracking-wide transition-colors duration-300 ${location === link.path
+                                    ? "text-gold"
+                                    : "text-white/80 hover:text-gold"
                                     }`}
                             >
                                 {link.label}
@@ -58,7 +59,7 @@ export default function MobileMenu({ isOpen, navLinks }: MobileMenuProps) {
 
                     <div className="mt-12 pt-8 border-t border-white/10">
                         <Link
-                            to="/admin"
+                            href="/admin"
                             className="text-sm text-white/60 hover:text-gold transition-colors duration-300"
                         >
                             Admin Panel →
