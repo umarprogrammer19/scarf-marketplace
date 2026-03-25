@@ -21,3 +21,9 @@
     transform: translate(-50%, -50%) rotateX(-8deg) rotateY(360deg);
   }
 }
+
+/* Force Cloudinary widget to always capture clicks */
+.uw-widget-container, iframe[src*="cloudinary"] {
+    pointer-events: auto !important;
+    z-index: 99999 !important;
+}

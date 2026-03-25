@@ -33,7 +33,7 @@ export const products = pgTable("products", {
     slug: varchar("slug", { length: 255 }).notNull().unique(),
     description: text("description").notNull(),
 
-    // Pricing & Stock
+    // Pricing & Stock (THESE ARE THE NEW ONES)
     price: numeric("price", { precision: 10, scale: 2 }).notNull(),
     originalPrice: numeric("original_price", { precision: 10, scale: 2 }),
     stockQuantity: integer("stock_quantity").notNull().default(0),
@@ -45,8 +45,8 @@ export const products = pgTable("products", {
     color: varchar("color", { length: 100 }),
 
     // Images
-    image: text("image").notNull(), // Main thumbnail
-    images: jsonb("images").$type<string[]>().default([]), // Array of gallery images
+    image: text("image").notNull(),
+    images: jsonb("images").$type<string[]>().default([]),
 
     // Flags
     featured: boolean("featured").default(false).notNull(),
