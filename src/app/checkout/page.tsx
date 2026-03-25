@@ -1,42 +1,52 @@
 "use client";
 import { useState } from "react";
-import { useCart } from "../../context/CartContext";
-import { Shield, Lock } from "lucide-react";
+import { useCart } from "@/context/CartContext";
+import { Shield, Lock, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { placeOrder } from "./actions"; // Import our new action
 
 export default function CheckoutPage() {
-    const { cart, getCartTotal } = useCart();
-    const navigate = useRouter();
+    const { cart, getCartTotal, clearCart } = useCart();
+    const router = useRouter();
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
-        fullName: "",
-        email: "",
-        phone: "",
-        address: "",
-        city: "",
-        postalCode: "",
-        notes: "",
+        fullName: "", email: "", phone: "", address: "",
+        city: "", postalCode: "", notes: "",
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setIsSubmitting(true);
 
-        // Simulate order placement
-        const orderId = `ORD-${Date.now()}`;
+        // Package the data and total
+        const orderPayload = {
+            ...formData,
+            total: getCartTotal(),
+        };
 
-        toast.success("Order Placed Successfully!", {
-            description: `Your order ${orderId} has been confirmed`,
-        });
+        // Call the server action
+        const result = await placeOrder(orderPayload, cart);
 
-        navigate.push(`/checkout/success?${orderId}`);
+        if (result.success) {
+            toast.success("Order Placed Successfully!", {
+                description: `Your order ${result.orderId} has been confirmed`,
+            });
+            clearCart(); // Empty their cart
+            // Push to success page passing the order ID cleanly
+            router.push(`/checkout/success?id=${result.orderId}`);
+        } else {
+            toast.error("Checkout Failed", { description: result.error });
+            setIsSubmitting(false);
+        }
     };
 
-    if (cart.length === 0) {
-        navigate.push("/cart");
+    if (cart.length === 0 && !isSubmitting) {
+        router.push("/cart");
         return null;
     }
 

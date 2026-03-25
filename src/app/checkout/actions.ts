@@ -4,48 +4,46 @@ import { db } from "@/db";
 import { orders, orderItems, products } from "@/db/schema";
 import { eq, sql } from "drizzle-orm";
 
-export async function placeCODOrder(
-    formData: FormData,
-    cartItems: { id: number; quantity: number; price: string }[],
-    totalAmount: number
-) {
-    if (cartItems.length === 0) return { success: false, error: "Cart is empty" };
-
-    // Generate a random order number (e.g., AF-847294)
-    const orderNumber = `AF-${Math.floor(100000 + Math.random() * 900000)}`;
+export async function placeOrder(orderData: any, cartItems: any[]) {
+    // Generate a unique Order ID based on the timestamp
+    const orderId = `ORD-${Date.now()}`;
+    const fullAddress = `${orderData.address}, ${orderData.postalCode}. Notes: ${orderData.notes || 'None'}`;
 
     try {
-        // 1. Create the main Order record
-        const [newOrder] = await db.insert(orders).values({
-            orderNumber,
-            customerName: formData.get("customerName") as string,
-            customerPhone: formData.get("customerPhone") as string,
-            shippingAddress: formData.get("shippingAddress") as string,
-            city: formData.get("city") as string,
-            totalAmount: totalAmount.toString(),
-            paymentMethod: "COD",
+        // 1. Save the main order
+        await db.insert(orders).values({
+            id: orderId,
+            customerName: orderData.fullName,
+            email: orderData.email,
+            phone: orderData.phone,
+            address: fullAddress,
+            city: orderData.city,
+            totalAmount: String(orderData.total),
             status: "PENDING",
-        }).returning({ id: orders.id });
+            paymentMethod: "COD",
+        });
 
-        // 2. Insert all the specific items they bought
-        const orderItemsData = cartItems.map(item => ({
-            orderId: newOrder.id,
-            productId: item.id,
-            quantity: item.quantity,
-            priceAtTimeOfOrder: item.price,
-        }));
-        await db.insert(orderItems).values(orderItemsData);
-
-        // 3. Reduce the stock quantity in the database
+        // 2. Save the order items and update product stock
         for (const item of cartItems) {
+            // Save the item
+            await db.insert(orderItems).values({
+                orderId: orderId,
+                productId: Number(item.id),
+                quantity: item.quantity,
+                priceAtTimeOfOrder: String(item.price),
+            });
+
+            // Deduct the stock using raw SQL math
             await db.update(products)
-                .set({ stockQuantity: sql`${products.stockQuantity} - ${item.quantity}` })
-                .where(eq(products.id, item.id));
+                .set({ 
+                    stockQuantity: sql`${products.stockQuantity} - ${item.quantity}` 
+                })
+                .where(eq(products.id, Number(item.id)));
         }
 
-        return { success: true, orderNumber };
+        return { success: true, orderId };
     } catch (error) {
-        console.error("Failed to place order:", error);
-        return { success: false, error: "Failed to process checkout." };
+        console.error("Order Database Error:", error);
+        return { success: false, error: "Failed to place order." };
     }
 }

@@ -7,9 +7,9 @@ import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
 export default function OrderSuccessPage() {
-    const location = useSearchParams();
+    const searchParams = useSearchParams();
     const { clearCart } = useCart()
-    const orderId = location || "ORD-UNKNOWN";
+    const orderId = searchParams.get('id') || "ORD-UNKNOWN";
 
     useEffect(() => {
         // Trigger confetti animation
