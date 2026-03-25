@@ -5,14 +5,9 @@ import NewArrivals from "@/components/home/new-arrivals";
 import Reviews from "@/components/home/Reviews";
 import Footer from "@/components/storefront/Footer";
 import Navbar from "@/components/storefront/Navbar";
-import ProductCard from "@/components/storefront/ProductCard";
-import ProductCarousel3D from "@/components/storefront/ProductCarousel3D";
-import ScrollReveal from "@/components/storefront/ScrollReveal";
 import { db } from "@/db";
 import { products } from "@/db/schema";
 import { desc } from "drizzle-orm";
-import { Award, ChevronRight, Diamond, Paintbrush, Sparkles } from "lucide-react";
-import Link from "next/link";
 
 export const revalidate = 60;
 
@@ -29,69 +24,7 @@ export default async function HomePage() {
 
             {/* ===== HERO SECTION ===== */}
             <Hero />
-            {/* <section className="relative w-full min-h-[85vh] flex items-center overflow-hidden pt-16">
-                <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/20" />
 
-                <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-                        <div className="max-w-lg">
-                            <ScrollReveal delay={100}>
-                                <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-6 border border-primary/30 bg-primary/5 rounded-full">
-                                    <span className="text-[10px] font-bold tracking-[0.2em] text-primary uppercase">
-                                        Premium Accessories
-                                    </span>
-                                </div>
-                            </ScrollReveal>
-
-                            <ScrollReveal delay={250}>
-                                <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] font-bold text-foreground mb-6 leading-[1.15]">
-                                    Elevate Your<br />
-                                    Style with<br />
-                                    <span className="text-primary italic font-serif">Luxury Silk</span>
-                                </h1>
-                            </ScrollReveal>
-
-                            <ScrollReveal delay={400}>
-                                <p className="text-sm sm:text-base text-muted-foreground mb-8 leading-relaxed max-w-sm">
-                                    Discover our curated collection of premium and elegant scarves, hand-crafted for the modern visionary.
-                                </p>
-                            </ScrollReveal>
-
-                            <ScrollReveal delay={550}>
-                                <div className="flex flex-col gap-3 max-w-xs">
-                                    <Link
-                                        href="/shop"
-                                        className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-7 py-3 font-bold text-xs tracking-[0.15em] uppercase transition-all duration-300 hover:bg-primary/90 hover:shadow-[0_0_30px_rgba(212,175,55,0.3)] rounded-md"
-                                    >
-                                        Shop the Collection
-                                    </Link>
-                                    <Link
-                                        href="/about"
-                                        className="inline-flex items-center justify-center gap-2 border border-foreground/30 text-foreground px-7 py-3 font-bold text-xs tracking-[0.15em] uppercase transition-all duration-300 hover:border-primary hover:text-primary rounded-md"
-                                    >
-                                        View Lookbook
-                                    </Link>
-                                </div>
-                            </ScrollReveal>
-                        </div>
-
-                        <ScrollReveal delay={300} direction="left">
-                            <div className="hidden lg:flex justify-end">
-                                <div className="relative w-[400px] h-[520px] rounded-2xl overflow-hidden shadow-2xl shadow-primary/10 animate-[float_6s_ease-in-out_infinite]">
-                                    <Image
-                                        src="/home.png"
-                                        alt="Luxury Silk Scarf Model"
-                                        fill
-                                        className="object-cover"
-                                        priority
-                                    />
-                                    <div className="absolute inset-0 rounded-2xl ring-1 ring-primary/20" />
-                                </div>
-                            </div>
-                        </ScrollReveal>
-                    </div>
-                </div>
-            </section> */}
 
             {/* ===== 3D ROTATING CAROUSEL — Exclusive Collection ===== */}
             {/* {latestProducts.length > 0 && (
