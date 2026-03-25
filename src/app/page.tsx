@@ -20,8 +20,6 @@ export default async function HomePage() {
 
     return (
         <div className="min-h-screen bg-background text-foreground">
-            <Navbar />
-
             {/* ===== HERO SECTION ===== */}
             <Hero />
 
@@ -139,7 +137,6 @@ export default async function HomePage() {
             </section> */}
             <Reviews />
             <FAQs />
-            <Footer />
         </div>
     );
 }
