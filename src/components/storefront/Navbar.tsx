@@ -14,6 +14,9 @@ export default function Navbar() {
     const location = usePathname();
     const cartCount = getCartCount();
 
+    const locations = ["/admin", "/admin/users", "/admin/products", "/admin/orders"]
+
+    if (locations.includes(location)) return;
 
     useEffect(() => {
         setMounted(true);

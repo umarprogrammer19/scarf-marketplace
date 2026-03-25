@@ -1,11 +1,16 @@
 "use client";
 import { Facebook, Instagram, Mail, MapPin, Phone, Twitter } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
 export default function Footer() {
     const [email, setEmail] = useState("");
+    const pathName = usePathname();
+
+    const locations = ["/admin", "/admin/users", "/admin/products", "/admin/orders"]
+    if (locations.includes(pathName)) return;
 
     const handleNewsletterSubmit = (e: React.FormEvent) => {
         e.preventDefault();
