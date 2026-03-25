@@ -1,8 +1,11 @@
-import { products } from "../../data/mockData";
 import ProductCard from "../storefront/ProductCard";
+import { Product } from "@/types";
 
-export default function NewArrivals() {
+export default function NewArrivals({ products }: { products: Product[] }) {
+    // Filter the real products to only show ones marked as "New Arrival"
     const newArrivals = products.filter((p) => p.isNew).slice(0, 4);
+
+    if (newArrivals.length === 0) return null; // Hide section if no new arrivals
 
     return (
         <section className="py-24 px-4 sm:px-6 lg:px-8">
