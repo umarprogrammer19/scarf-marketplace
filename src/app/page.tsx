@@ -1,4 +1,5 @@
 import Hero from "@/components/home/hero-section";
+import NewArrivals from "@/components/home/new-arrivals";
 import Footer from "@/components/storefront/Footer";
 import Navbar from "@/components/storefront/Navbar";
 import ProductCard from "@/components/storefront/ProductCard";
@@ -138,7 +139,8 @@ export default async function HomePage() {
             )} */}
 
             {/* ===== PRODUCTS GRID ===== */}
-            {latestProducts.length > 0 && (
+            <NewArrivals />
+            {/* {latestProducts.length > 0 && (
                 <section className="py-16 md:py-20 border-t border-white/4">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <ScrollReveal>
@@ -163,7 +165,7 @@ export default async function HomePage() {
                         </div>
                     </div>
                 </section>
-            )}
+            )} */}
 
             {/* ===== BRAND STORY ===== */}
             <section className="py-20 md:py-24 border-t border-border">

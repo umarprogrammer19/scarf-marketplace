@@ -1,3 +1,4 @@
+"use client"
 import { Heart, Eye } from "lucide-react";
 import { Product } from "../../data/mockData";
 import { useCart } from "../../context/CartContext";
