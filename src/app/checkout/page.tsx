@@ -1,274 +1,268 @@
 "use client";
-
-import { useCartStore } from "@/store/cartStore";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useCart } from "@/context/CartContext";
+import { Shield, Lock, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { placeCODOrder } from "./actions";
-import { Loader2, Truck, ShieldCheck, ArrowLeft, Check } from "lucide-react";
-import Navbar from "@/components/storefront/Navbar";
-import Image from "next/image";
+import { placeOrder } from "./actions"; // Import our new action
 
 export default function CheckoutPage() {
-    const { items, getCartTotal, clearCart } = useCartStore();
+    const { cart, getCartTotal, clearCart } = useCart();
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [mounted, setMounted] = useState(false);
+    const [formData, setFormData] = useState({
+        fullName: "", email: "", phone: "", address: "",
+        city: "", postalCode: "", notes: "",
+    });
 
-    useEffect(() => setMounted(true), []);
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
 
-    if (!mounted) return null;
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSubmitting(true);
 
-    if (items.length === 0) {
+        // Package the data and total
+        const orderPayload = {
+            ...formData,
+            total: getCartTotal(),
+        };
+
+        // Call the server action
+        const result = await placeOrder(orderPayload, cart);
+
+        if (result.success) {
+            toast.success("Order Placed Successfully!", {
+                description: `Your order ${result.orderId} has been confirmed`,
+            });
+            clearCart(); // Empty their cart
+            // Push to success page passing the order ID cleanly
+            router.push(`/checkout/success?id=${result.orderId}`);
+        } else {
+            toast.error("Checkout Failed", { description: result.error });
+            setIsSubmitting(false);
+        }
+    };
+
+    if (cart.length === 0 && !isSubmitting) {
         router.push("/cart");
         return null;
     }
 
-    const subtotal = getCartTotal();
-    const tax = Math.round(subtotal * 0.05);
-    const total = subtotal + tax;
-
-    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-        e.preventDefault();
-        setIsSubmitting(true);
-
-        const formData = new FormData(e.currentTarget);
-        const cartItemsPayload = items.map((item) => ({
-            id: item.id,
-            quantity: item.quantity,
-            price: item.price,
-        }));
-
-        const result = await placeCODOrder(formData, cartItemsPayload, total);
-
-        if (result.success) {
-            clearCart();
-            router.push(`/checkout/success?order=${result.orderNumber}`);
-        } else {
-            alert("Something went wrong. Please try again.");
-            setIsSubmitting(false);
-        }
-    }
-
     return (
-        <div className="min-h-screen bg-background">
-            <Navbar />
-
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                {/* Header */}
-                <button
-                    onClick={() => router.back()}
-                    className="inline-flex items-center gap-2 text-primary hover:text-primary/80 font-medium mb-8 transition-colors"
-                >
-                    <ArrowLeft size={20} />
-                    Back
-                </button>
-
-                <div className="mb-12">
-                    <h1 className="text-4xl sm:text-5xl font-bold text-foreground">
-                        Secure Checkout
-                    </h1>
-                    <p className="text-muted-foreground mt-2">
-                        Complete your order with Cash on Delivery
-                    </p>
+        <div className="min-h-screen pt-20 pb-12 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto">
+                <div className="text-center mb-12">
+                    <h1 className="text-4xl md:text-5xl text-white mb-4">Checkout</h1>
+                    <div className="flex items-center justify-center space-x-2 text-white/60">
+                        <Shield className="w-5 h-5 text-gold" />
+                        <span>Secure Checkout</span>
+                        <Lock className="w-4 h-4 text-gold" />
+                    </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="grid lg:grid-cols-3 gap-12">
                     {/* Checkout Form */}
                     <div className="lg:col-span-2">
-                        <form onSubmit={handleSubmit} className="space-y-6">
-                            {/* Shipping Details Section */}
-                            <div className="bg-secondary/40 border border-border rounded-xl p-8 space-y-6">
-                                <div className="flex items-center gap-3 pb-6 border-b border-border">
-                                    <div className="shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                                        <Truck size={20} className="text-primary" />
-                                    </div>
-                                    <h2 className="text-xl font-bold text-foreground">
-                                        Delivery Details
-                                    </h2>
-                                </div>
-
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                    <div className="space-y-2">
-                                        <label className="block text-sm font-medium text-foreground">
-                                            Full Name <span className="text-red-500">*</span>
-                                        </label>
+                        <form onSubmit={handleSubmit} className="space-y-8">
+                            {/* Contact Information */}
+                            <div className="bg-card border border-white/10 rounded-2xl p-8">
+                                <h2 className="text-2xl font-semibold text-white mb-6">
+                                    Contact Information
+                                </h2>
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    <div className="relative">
                                         <input
                                             type="text"
-                                            name="customerName"
+                                            name="fullName"
+                                            value={formData.fullName}
+                                            onChange={handleChange}
                                             required
-                                            className="w-full bg-background border border-border rounded-lg px-4 py-3 text-foreground placeholder-muted-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-                                            placeholder="Ammar Khan"
+                                            placeholder=" "
+                                            className="peer w-full px-4 py-4 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-transparent focus:outline-none focus:border-gold transition-colors duration-300"
                                         />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="block text-sm font-medium text-foreground">
-                                            Phone Number <span className="text-red-500">*</span>
+                                        <label className="absolute left-4 top-4 text-white/60 transition-all duration-300 peer-placeholder-shown:text-white/60 peer-placeholder-shown:top-4 peer-focus:top-0 peer-focus:text-xs peer-focus:text-gold peer-[:not(:placeholder-shown)]:top-0 peer-[:not(:placeholder-shown)]:text-xs px-1">
+                                            Full Name *
                                         </label>
+                                    </div>
+
+                                    <div className="relative">
+                                        <input
+                                            type="email"
+                                            name="email"
+                                            value={formData.email}
+                                            onChange={handleChange}
+                                            required
+                                            placeholder=" "
+                                            className="peer w-full px-4 py-4 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-transparent focus:outline-none focus:border-gold transition-colors duration-300"
+                                        />
+                                        <label className="absolute left-4 top-4 text-white/60 transition-all duration-300 peer-placeholder-shown:text-white/60 peer-placeholder-shown:top-4 peer-focus:top-0 peer-focus:text-xs peer-focus:text-gold peer-[:not(:placeholder-shown)]:top-0 peer-[:not(:placeholder-shown)]:text-xs px-1">
+                                            Email Address *
+                                        </label>
+                                    </div>
+
+                                    <div className="relative">
                                         <input
                                             type="tel"
-                                            name="customerPhone"
+                                            name="phone"
+                                            value={formData.phone}
+                                            onChange={handleChange}
                                             required
-                                            className="w-full bg-background border border-border rounded-lg px-4 py-3 text-foreground placeholder-muted-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-                                            placeholder="0300 1234567"
+                                            placeholder=" "
+                                            className="peer w-full px-4 py-4 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-transparent focus:outline-none focus:border-gold transition-colors duration-300"
                                         />
-                                    </div>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <label className="block text-sm font-medium text-foreground">
-                                        Complete Delivery Address <span className="text-red-500">*</span>
-                                    </label>
-                                    <textarea
-                                        name="shippingAddress"
-                                        required
-                                        rows={3}
-                                        className="w-full bg-background border border-border rounded-lg px-4 py-3 text-foreground placeholder-muted-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none resize-none transition-all"
-                                        placeholder="House/Apt No, Street Name, Area..."
-                                    />
-                                </div>
-
-                                <div className="space-y-2">
-                                    <label className="block text-sm font-medium text-foreground">
-                                        City <span className="text-red-500">*</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="city"
-                                        required
-                                        className="w-full bg-background border border-border rounded-lg px-4 py-3 text-foreground placeholder-muted-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-                                        placeholder="Karachi"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Payment Method Section */}
-                            <div className="bg-secondary/40 border border-border rounded-xl p-8 space-y-6">
-                                <div className="flex items-center gap-3 pb-6 border-b border-border">
-                                    <div className="shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                                        <ShieldCheck size={20} className="text-primary" />
-                                    </div>
-                                    <h2 className="text-xl font-bold text-foreground">
-                                        Payment Method
-                                    </h2>
-                                </div>
-
-                                <div className="p-4 bg-primary/10 border border-primary/30 rounded-lg flex items-start gap-3">
-                                    <Check size={20} className="text-primary shrink-0 mt-1" />
-                                    <div>
-                                        <p className="font-semibold text-foreground">
-                                            Cash on Delivery (COD)
-                                        </p>
-                                        <p className="text-sm text-muted-foreground mt-1">
-                                            Pay securely when the rider delivers your package to your doorstep. No upfront payment required.
-                                        </p>
+                                        <label className="absolute left-4 top-4 text-white/60 transition-all duration-300 peer-placeholder-shown:text-white/60 peer-placeholder-shown:top-4 peer-focus:top-0 peer-focus:text-xs peer-focus:text-gold peer-[:not(:placeholder-shown)]:top-0 peer-[:not(:placeholder-shown)]:text-xs px-1">
+                                            Phone Number *
+                                        </label>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Submit Button */}
+                            {/* Shipping Address */}
+                            <div className="border bg-card border-white/10 rounded-2xl p-8">
+                                <h2 className="text-2xl font-semibold text-white mb-6">
+                                    Shipping Address
+                                </h2>
+                                <div className="space-y-6">
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            name="address"
+                                            value={formData.address}
+                                            onChange={handleChange}
+                                            required
+                                            placeholder=" "
+                                            className="peer w-full px-4 py-4 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-transparent focus:outline-none focus:border-gold transition-colors duration-300"
+                                        />
+                                        <label className="absolute left-4 top-4 text-white/60 transition-all duration-300 peer-placeholder-shown:text-white/60 peer-placeholder-shown:top-4 peer-focus:top-0 peer-focus:text-xs peer-focus:text-gold peer-[:not(:placeholder-shown)]:top-0 peer-[:not(:placeholder-shown)]:text-xs px-1">
+                                            Street Address *
+                                        </label>
+                                    </div>
+
+                                    <div className="grid md:grid-cols-2 gap-6">
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                name="city"
+                                                value={formData.city}
+                                                onChange={handleChange}
+                                                required
+                                                placeholder=" "
+                                                className="peer w-full px-4 py-4 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-transparent focus:outline-none focus:border-gold transition-colors duration-300"
+                                            />
+                                            <label className="absolute left-4 top-4 text-white/60 transition-all duration-300 peer-placeholder-shown:text-white/60 peer-placeholder-shown:top-4 peer-focus:top-0 peer-focus:text-xs peer-focus:text-gold peer-[:not(:placeholder-shown)]:top-0 peer-[:not(:placeholder-shown)]:text-xs px-1">
+                                                City *
+                                            </label>
+                                        </div>
+
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                name="postalCode"
+                                                value={formData.postalCode}
+                                                onChange={handleChange}
+                                                required
+                                                placeholder=" "
+                                                className="peer w-full px-4 py-4 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-transparent focus:outline-none focus:border-gold transition-colors duration-300"
+                                            />
+                                            <label className="absolute left-4 top-4 text-white/60 transition-all duration-300 peer-placeholder-shown:text-white/60 peer-placeholder-shown:top-4 peer-focus:top-0 peer-focus:text-xs peer-focus:text-gold peer-[:not(:placeholder-shown)]:top-0 peer-[:not(:placeholder-shown)]:text-xs px-1">
+                                                Postal Code *
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div className="relative">
+                                        <textarea
+                                            name="notes"
+                                            value={formData.notes}
+                                            onChange={handleChange}
+                                            rows={4}
+                                            placeholder=" "
+                                            className="peer w-full px-4 py-4 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-transparent focus:outline-none focus:border-gold transition-colors duration-300 resize-none"
+                                        />
+                                        <label className="absolute left-4 top-4 text-white/60 transition-all duration-300 peer-placeholder-shown:text-white/60 peer-placeholder-shown:top-4 peer-focus:top-0 peer-focus:text-xs peer-focus:text-gold peer-[:not(:placeholder-shown)]:top-0 peer-[:not(:placeholder-shown)]:text-xs px-1">
+                                            Order Notes (Optional)
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Payment Method */}
+                            <div className="bg-card border border-white/10 rounded-2xl p-8">
+                                <h2 className="text-2xl font-semibold text-white mb-6">
+                                    Payment Method
+                                </h2>
+                                <div className="p-6 bg-gold/10 border border-gold/30 rounded-lg">
+                                    <div className="flex items-center space-x-3">
+                                        <div className="w-12 h-12 bg-gold rounded-lg flex items-center justify-center">
+                                            <Shield className="w-6 h-6 text-black" />
+                                        </div>
+                                        <div>
+                                            <p className="text-white font-semibold">Cash on Delivery (COD)</p>
+                                            <p className="text-white/60 text-sm">
+                                                Pay when you receive your order
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <button
                                 type="submit"
-                                disabled={isSubmitting}
-                                className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-primary-foreground font-bold text-lg py-4 rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 flex items-center justify-center gap-2"
+                                className="w-full py-4 bg-gold text-black font-semibold rounded-lg hover:bg-gold-light transition-all duration-300 hover:shadow-[0_0_30px_rgba(212,175,55,0.3)]"
                             >
-                                {isSubmitting ? (
-                                    <>
-                                        <Loader2 className="animate-spin" size={20} />
-                                        Processing...
-                                    </>
-                                ) : (
-                                    <>
-                                        <Check size={20} />
-                                        Confirm Order - Rs. {total.toLocaleString()}
-                                    </>
-                                )}
+                                Place Order
                             </button>
                         </form>
                     </div>
 
-                    {/* Order Summary Sidebar */}
+                    {/* Order Review Sidebar */}
                     <div className="lg:col-span-1">
-                        <div className="bg-secondary/40 border border-border rounded-xl p-6 lg:p-8 sticky top-24 space-y-6">
-                            <h2 className="text-2xl font-bold text-foreground">Order Summary</h2>
+                        <div className="sticky top-24 bg-linear-to-br from-white/5 to-white/2 border border-white/10 rounded-2xl p-8 backdrop-blur-sm">
+                            <h2 className="text-2xl font-semibold text-white mb-6">
+                                Order Review
+                            </h2>
 
-                            {/* Items */}
-                            <div className="space-y-4 max-h-96 overflow-y-auto pr-2 border-b border-border pb-6">
-                                {items.map((item) => (
-                                    <div key={item.id} className="flex gap-3 items-start">
-                                        <div className="relative w-12 h-16 shrink-0 rounded-lg overflow-hidden bg-secondary">
-                                            <Image
-                                                src={item.imageUrl}
-                                                alt={item.name}
-                                                fill
-                                                className="object-cover"
-                                            />
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="font-medium text-foreground line-clamp-1 text-sm">
-                                                {item.name}
-                                            </p>
-                                            <p className="text-xs text-muted-foreground">
-                                                Qty: {item.quantity}
-                                            </p>
-                                            <p className="text-sm font-semibold text-primary mt-1">
-                                                Rs. {(Number(item.price) * item.quantity).toLocaleString()}
-                                            </p>
+                            <div className="space-y-4 mb-6 max-h-64 overflow-y-auto">
+                                {cart.map((item) => (
+                                    <div key={item.id} className="flex gap-4">
+                                        <img
+                                            src={item.image}
+                                            alt={item.name}
+                                            className="w-16 h-16 rounded-lg object-cover"
+                                        />
+                                        <div className="flex-1">
+                                            <p className="text-white text-sm font-semibold">{item.name}</p>
+                                            <p className="text-white/60 text-xs">Qty: {item.quantity}</p>
+                                            <p className="text-gold text-sm font-bold">${item.price}</p>
                                         </div>
                                     </div>
                                 ))}
                             </div>
 
-                            {/* Price Breakdown */}
-                            <div className="space-y-3">
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-muted-foreground">Subtotal</span>
-                                    <span className="text-foreground font-medium">
-                                        Rs. {subtotal.toLocaleString()}
-                                    </span>
+                            <div className="space-y-3 border-t border-white/10 pt-4 mb-4">
+                                <div className="flex justify-between text-white/70">
+                                    <span>Subtotal</span>
+                                    <span>${getCartTotal().toFixed(2)}</span>
                                 </div>
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-muted-foreground">Tax (5%)</span>
-                                    <span className="text-foreground font-medium">
-                                        Rs. {tax.toLocaleString()}
-                                    </span>
+                                <div className="flex justify-between text-white/70">
+                                    <span>Shipping</span>
+                                    <span className="text-gold">Free</span>
                                 </div>
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-muted-foreground">Shipping</span>
-                                    <span className="text-primary font-medium">Free</span>
+                                <div className="flex justify-between text-xl font-bold pt-3 border-t border-white/10">
+                                    <span className="text-white">Total</span>
+                                    <span className="text-gold">${getCartTotal().toFixed(2)}</span>
                                 </div>
                             </div>
 
-                            {/* Total */}
-                            <div className="pt-3 border-t border-border">
-                                <div className="flex justify-between items-center">
-                                    <span className="text-lg font-semibold text-foreground">
-                                        Total
-                                    </span>
-                                    <span className="text-2xl font-bold text-primary">
-                                        Rs. {total.toLocaleString()}
-                                    </span>
-                                </div>
-                            </div>
-
-                            {/* Trust Badges */}
-                            <div className="space-y-2 pt-6 border-t border-border">
-                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                    <ShieldCheck size={16} className="text-primary" />
-                                    100% Secure Payment
-                                </div>
-                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                    <Check size={16} className="text-primary" />
-                                    Guaranteed Authentic
-                                </div>
-                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                    <Truck size={16} className="text-primary" />
-                                    Fast Delivery
-                                </div>
+                            <div className="text-center text-xs text-white/40">
+                                <p>🔒 Your information is secure and encrypted</p>
                             </div>
                         </div>
                     </div>
                 </div>
-            </main>
+            </div>
         </div>
     );
 }

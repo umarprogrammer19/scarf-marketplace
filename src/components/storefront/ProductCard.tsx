@@ -1,118 +1,106 @@
-"use client";
-
-import Image from "next/image";
-import Link from "next/link";
-import { Star, Heart, ShoppingBag } from "lucide-react";
+"use client"
+import { Heart, Eye } from "lucide-react";
+import { Product } from "../../data/mockData";
+import { useCart } from "../../context/CartContext";
 import { useState } from "react";
+import QuickViewModal from "../home/QuickViewModal";
+import Link from "next/link";
 
 interface ProductCardProps {
-    id: string;
-    name: string;
-    price: number;
-    image: string;
-    isNew?: boolean;
-    isOnSale?: boolean;
-    rating?: number;
-    onAddToCart?: () => void;
-    slug: string;
+    product: Product;
 }
 
-export default function ProductCard({
-    name,
-    price,
-    image,
-    isNew,
-    isOnSale,
-    rating = 5,
-    onAddToCart,
-    slug
-}: ProductCardProps) {
-    const [isWishlisted, setIsWishlisted] = useState(false);
-    const [imageError, setImageError] = useState(false);
+export default function ProductCard({ product }: ProductCardProps) {
+    const { addToCart } = useCart();
+    const [showQuickView, setShowQuickView] = useState(false);
+
+    const handleAddToCart = (e: React.MouseEvent) => {
+        e.preventDefault();
+        addToCart(product);
+    };
 
     return (
-        <Link href={`/product/${slug}`} className="group block cursor-pointer">
-            {/* Editorial Image Container */}
-            <div className="relative aspect-4/5 overflow-hidden rounded-xl bg-secondary/30 mb-5">
-                <Image
-                    src={imageError ? "https://images.unsplash.com/photo-1771030668418-390b3edf33e4?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxNHx8fGVufDB8fHx8fA%3D%3D" : image}
-                    alt={name}
-                    fill
-                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
-                    onError={() => setImageError(true)}
-                />
+        <>
+            <div className="group relative bg-card rounded-lg overflow-hidden border border-white/5 hover:border-gold/30 transition-all duration-500">
+                {/* Image Container */}
+                <Link href={`/product/${product.id}`} className="block relative overflow-hidden aspect-3/4">
+                    <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
 
-                {/* Subtle Gradient Overlay on Hover for Text Contrast */}
-                <div className="absolute inset-0 bg-linear-to-t from-background/80 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                    {/* Overlay on Hover */}
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center space-x-3">
+                        <button
+                            onClick={handleAddToCart}
+                            className="px-6 py-2 bg-gold text-black font-semibold rounded-lg hover:bg-gold-light transition-all duration-300 transform translate-y-4 group-hover:translate-y-0"
+                        >
+                            Add to Cart
+                        </button>
+                        <button
+                            onClick={(e) => {
+                                e.preventDefault();
+                                setShowQuickView(true);
+                            }}
+                            className="w-10 h-10 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg flex items-center justify-center text-white hover:bg-gold hover:text-black transition-all duration-300 transform translate-y-4 group-hover:translate-y-0"
+                        >
+                            <Eye className="w-5 h-5" />
+                        </button>
+                    </div>
 
-                {/* Minimalist Top Badges & Actions */}
-                <div className="absolute top-4 left-4 right-4 flex items-start justify-between z-10">
-                    <div className="flex flex-col gap-2">
-                        {isNew && (
-                            <span className="bg-primary text-primary-foreground text-[10px] font-bold tracking-widest px-3 py-1 rounded-full uppercase shadow-lg">
-                                New
+                    {/* Badges */}
+                    <div className="absolute top-4 left-4 flex flex-col gap-2">
+                        {product.isNew && (
+                            <span className="px-3 py-1 bg-gold text-black text-xs font-semibold rounded-full">
+                                NEW
                             </span>
                         )}
-                        {isOnSale && (
-                            <span className="bg-destructive text-destructive-foreground text-[10px] font-bold tracking-widest px-3 py-1 rounded-full uppercase shadow-lg">
-                                Sale
+                        {product.isFlashSale && (
+                            <span className="px-3 py-1 bg-destructive text-white text-xs font-semibold rounded-full">
+                                SALE
+                            </span>
+                        )}
+                        {!product.inStock && (
+                            <span className="px-3 py-1 bg-black/80 text-white text-xs font-semibold rounded-full">
+                                SOLD OUT
                             </span>
                         )}
                     </div>
 
-                    <button
-                        onClick={(e) => {
-                            e.preventDefault();
-                            setIsWishlisted(!isWishlisted);
-                        }}
-                        className="flex items-center justify-center w-10 h-10 rounded-full bg-background/50 backdrop-blur-md text-foreground hover:bg-primary hover:text-primary-foreground transition-all duration-300 shadow-lg"
-                    >
-                        <Heart size={18} className={isWishlisted ? "fill-current text-primary" : ""} />
+                    {/* Wishlist */}
+                    <button className="absolute top-4 right-4 w-10 h-10 bg-black/40 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-gold hover:text-black transition-all duration-300 opacity-0 group-hover:opacity-100">
+                        <Heart className="w-5 h-5" />
                     </button>
-                </div>
+                </Link>
 
-                {/* Sexy Slide-up 'Add to Cart' */}
-                <div className="absolute bottom-0 left-0 w-full translate-y-full opacity-0 transition-all duration-500 ease-out group-hover:translate-y-0 group-hover:opacity-100 z-10">
-                    <button
-                        onClick={(e) => {
-                            e.preventDefault();
-                            onAddToCart?.();
-                        }}
-                        className="w-full bg-primary/95 backdrop-blur-sm text-primary-foreground py-4 font-bold tracking-wider uppercase text-xs flex items-center justify-center gap-2 hover:bg-primary transition-colors"
-                    >
-                        <ShoppingBag size={16} />
-                        Quick Add
-                    </button>
+                {/* Product Info */}
+                <div className="p-6">
+                    <Link href={`/product/${product.id}`}>
+                        <p className="text-xs text-gold uppercase tracking-wider mb-2">
+                            {product.category}
+                        </p>
+                        <h3 className="text-lg font-semibold text-white mb-2 hover:text-gold transition-colors duration-300">
+                            {product.name}
+                        </h3>
+                    </Link>
+
+                    <div className="flex items-center space-x-2">
+                        <span className="text-xl font-bold text-gold">${product.price}</span>
+                        {product.originalPrice && (
+                            <span className="text-sm text-white/40 line-through">
+                                ${product.originalPrice}
+                            </span>
+                        )}
+                    </div>
                 </div>
             </div>
 
-            {/* Understated Product Info */}
-            <div className="flex flex-col items-center text-center px-2">
-                <div className="flex items-center gap-1 mb-2">
-                    {[...Array(5)].map((_, i) => (
-                        <Star
-                            key={i}
-                            size={12}
-                            className={i < Math.round(rating) ? "fill-primary text-primary" : "text-muted"}
-                        />
-                    ))}
-                </div>
-
-                <h3 className=" text-lg text-foreground group-hover:text-primary transition-colors line-clamp-1 mb-1">
-                    {name}
-                </h3>
-
-                <div className="flex items-center gap-3">
-                    <span className="text-md font-medium text-muted-foreground">
-                        Rs. {Math.round(price).toLocaleString()}
-                    </span>
-                    {isOnSale && (
-                        <span className="text-sm text-muted-foreground/50 line-through">
-                            Rs. {Math.round(price * 1.2).toLocaleString()}
-                        </span>
-                    )}
-                </div>
-            </div>
-        </Link>
+            <QuickViewModal
+                product={product}
+                isOpen={showQuickView}
+                onClose={() => setShowQuickView(false)}
+            />
+        </>
     );
 }

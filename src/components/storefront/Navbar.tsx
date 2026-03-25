@@ -1,147 +1,116 @@
-'use client';
-
-import Link from 'next/link';
-import { ShoppingBag, Search, Menu, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import Image from 'next/image';
+"use client"
+import { Menu, Search, ShoppingCart, X } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useCart } from "../../context/CartContext";
+import MobileMenu from "./MobileMenu";
+import Link from "next/link";
 
 export default function Navbar() {
+    const [isScrolled, setIsScrolled] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [scrolled, setScrolled] = useState(false);
-    const [itemCount, setItemCount] = useState(0);
+    const { getCartCount } = useCart();
+    const location = usePathname();
+    const cartCount = getCartCount();
+
+    const locations = ["/admin", "/admin/users", "/admin/products", "/admin/orders"]
+
+    if (locations.includes(location)) return;
 
     useEffect(() => {
         setMounted(true);
-        const handleScroll = () => setScrolled(window.scrollY > 10);
-        window.addEventListener('scroll', handleScroll);
-
-        // Get cart count from localStorage
-        const cart = localStorage.getItem('cart-storage');
-        if (cart) {
-            try {
-                const cartData = JSON.parse(cart);
-                const count = cartData.state?.items?.reduce((total: number, item: any) => total + item.quantity, 0) || 0;
-                setItemCount(count);
-            } catch (e) {
-                setItemCount(0);
-            }
-        }
-
-        return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    useEffect(() => {
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 20);
+        };
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
+
+    useEffect(() => {
+        setIsMobileMenuOpen(false);
+    }, [location]);
+
+    const navLinks = [
+        { label: "Home", path: "/" },
+        { label: "Shop", path: "/shop" },
+        { label: "About", path: "/about" },
+        { label: "Contact", path: "/contact" },
+        { label: "Track Order", path: "/track-order" },
+    ];
+
     return (
-        <header
-            className={`sticky top-0 z-50 w-full transition-all duration-300 ${scrolled
-                    ? "bg-background/95 backdrop-blur-xl border-b border-primary/20 shadow-lg"
-                    : "bg-background border-b border-border"
-                }`}
-        >
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="h-20 flex items-center justify-between">
-                    {/* Logo */}
-                    <Link href="/" className="flex items-center gap-3 group">
-                        <div className="w-10 h-10 relative">
-                            <Image
-                                src="/logo.jpeg"
-                                alt="Al Faizan"
-                                width={40}
-                                height={40}
-                                className="object-contain"
-                            />
+        <>
+            <nav
+                className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled
+                    ? "bg-black/80 backdrop-blur-xl border-b border-white/10"
+                    : "bg-transparent"
+                    }`}
+            >
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex items-center justify-between h-20">
+                        {/* Logo */}
+                        <Link href="/" className="flex items-center space-x-2 group">
+                            <div className="text-2xl font-bold">
+                                <span className="text-gold">LUXE</span>
+                                <span className="text-white"> SCARVES</span>
+                            </div>
+                        </Link>
+
+                        {/* Desktop Navigation */}
+                        <div className="hidden md:flex items-center space-x-8">
+                            {navLinks.map((link) => (
+                                <Link
+                                    key={link.path}
+                                    href={link.path}
+                                    className={`text-sm tracking-wide transition-colors duration-300 relative group ${location === link.path
+                                        ? "text-gold"
+                                        : "text-white/80 hover:text-gold"
+                                        }`}
+                                >
+                                    {link.label}
+                                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gold transition-all duration-300 group-hover:w-full" />
+                                </Link>
+                            ))}
                         </div>
-                        <div className="hidden sm:flex flex-col">
-                            <span className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
-                                AL FAIZAN
-                            </span>
-                            <span className="text-xs text-muted-foreground">Premium Scarves</span>
+
+                        {/* Actions */}
+                        <div className="flex items-center space-x-4">
+                            <Link
+                                href="/cart"
+                                className="relative text-white/80 hover:text-gold transition-colors duration-300"
+                                aria-label="Shopping Cart"
+                            >
+                                <ShoppingCart className="w-5 h-5" />
+                                {mounted && cartCount > 0 && (
+                                    <span className="absolute -top-2 -right-2 bg-gold text-black text-xs w-5 h-5 rounded-full flex items-center justify-center font-semibold animate-fade-in">
+                                        {cartCount}
+                                    </span>
+                                )}
+                            </Link>
+
+                            {/* Mobile Menu Toggle */}
+                            <button
+                                className="md:hidden text-white/80 hover:text-gold transition-colors duration-300"
+                                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                                aria-label="Toggle menu"
+                            >
+                                {isMobileMenuOpen ? (
+                                    <X className="w-6 h-6" />
+                                ) : (
+                                    <Menu className="w-6 h-6" />
+                                )}
+                            </button>
                         </div>
-                    </Link>
-
-                    {/* Desktop Navigation */}
-                    <nav className="hidden md:flex items-center gap-8">
-                        <Link
-                            href="/"
-                            className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200"
-                        >
-                            Home
-                        </Link>
-                        <Link
-                            href="/shop"
-                            className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200"
-                        >
-                            Shop
-                        </Link>
-                        <Link
-                            href="/about"
-                            className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200"
-                        >
-                            About
-                        </Link>
-                    </nav>
-
-                    {/* Right Section */}
-                    <div className="flex items-center gap-4">
-                        {/* Search Icon (desktop) */}
-                        <button className="hidden sm:flex items-center justify-center w-10 h-10 rounded-lg hover:bg-secondary transition-colors duration-200">
-                            <Search size={20} className="text-muted-foreground" />
-                        </button>
-
-                        {/* Cart */}
-                        <Link
-                            href="/cart"
-                            className="relative flex items-center justify-center w-10 h-10 rounded-lg hover:bg-secondary transition-colors duration-200"
-                        >
-                            <ShoppingBag size={20} className="text-muted-foreground hover:text-primary" />
-                            {mounted && itemCount > 0 && (
-                                <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs font-bold h-5 w-5 rounded-full flex items-center justify-center">
-                                    {itemCount}
-                                </span>
-                            )}
-                        </Link>
-
-                        {/* Mobile Menu Button */}
-                        <button
-                            className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg hover:bg-secondary transition-colors duration-200"
-                            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                        >
-                            {mobileMenuOpen ? (
-                                <X size={20} />
-                            ) : (
-                                <Menu size={20} />
-                            )}
-                        </button>
                     </div>
                 </div>
+            </nav>
 
-                {/* Mobile Menu */}
-                {mobileMenuOpen && (
-                    <div className="md:hidden border-t border-border py-4 space-y-2 animate-in fade-in slide-in-from-top-2">
-                        <Link
-                            href="/"
-                            className="block px-4 py-2 text-sm font-medium text-muted-foreground hover:text-primary hover:bg-secondary rounded-lg transition-colors"
-                            onClick={() => setMobileMenuOpen(false)}
-                        >
-                            Home
-                        </Link>
-                        <Link
-                            href="/shop"
-                            className="block px-4 py-2 text-sm font-medium text-muted-foreground hover:text-primary hover:bg-secondary rounded-lg transition-colors"
-                            onClick={() => setMobileMenuOpen(false)}
-                        >
-                            Shop
-                        </Link>
-                        <Link
-                            href="/about"
-                            className="block px-4 py-2 text-sm font-medium text-muted-foreground hover:text-primary hover:bg-secondary rounded-lg transition-colors"
-                            onClick={() => setMobileMenuOpen(false)}
-                        >
-                            About
-                        </Link>
-                    </div>
-                )}
-            </div>
-        </header>
+            {/* Mobile Menu */}
+            <MobileMenu isOpen={isMobileMenuOpen} navLinks={navLinks} />
+        </>
     );
 }
