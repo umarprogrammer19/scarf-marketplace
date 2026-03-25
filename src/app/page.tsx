@@ -1,6 +1,7 @@
 import FlashSale from "@/components/home/flash-sale";
 import Hero from "@/components/home/hero-section";
 import NewArrivals from "@/components/home/new-arrivals";
+import Reviews from "@/components/home/Reviews";
 import Footer from "@/components/storefront/Footer";
 import Navbar from "@/components/storefront/Navbar";
 import ProductCard from "@/components/storefront/ProductCard";
@@ -202,9 +203,9 @@ export default async function HomePage() {
                     </div>
                 </div>
             </section> */}
-
+            <Reviews />
             {/* ===== NEWSLETTER ===== */}
-            <ScrollReveal>
+            {/* <ScrollReveal>
                 <section className="py-14 md:py-16 bg-card border-y border-border">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
@@ -229,7 +230,7 @@ export default async function HomePage() {
                         </div>
                     </div>
                 </section>
-            </ScrollReveal>
+            </ScrollReveal> */}
 
             <Footer />
         </div>
