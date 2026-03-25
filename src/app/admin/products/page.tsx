@@ -1,141 +1,255 @@
-import { db } from "@/db";
-import { products, categories } from "@/db/schema";
-import { desc, eq } from "drizzle-orm";
-import Link from "next/link";
-import { Edit, Trash2, Filter } from "lucide-react";
-import { deleteProduct } from "./actions";
+"use client";
+import { useState } from "react";
+import { products as initialProducts } from "../../../data/mockData";
+import { Search, Plus, Edit, Trash2, Upload } from "lucide-react";
+import * as Dialog from "@radix-ui/react-dialog";
+import { X } from "lucide-react";
+import { toast } from "sonner";
 
-export default async function AdminProductsList() {
-    const allProducts = await db
-        .select({
-            id: products.id,
-            name: products.name,
-            price: products.price,
-            stockQuantity: products.stockQuantity,
-            imageUrl: products.imageUrl,
-            isNew: products.isNew,
-            isOnSale: products.isOnSale,
-            categoryName: categories.name,
-        })
-        .from(products)
-        .leftJoin(categories, eq(products.categoryId, categories.id))
-        .orderBy(desc(products.createdAt));
+export default function AdminProducts() {
+    const [products, setProducts] = useState(initialProducts);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [formData, setFormData] = useState({
+        name: "",
+        price: "",
+        category: "Pashmina",
+        fabric: "",
+        color: "",
+        description: "",
+    });
 
-    const getStockBadge = (qty: number) => {
-        if (qty === 0) return { label: "Out of Stock", cls: "bg-red-500/10 text-red-500" };
-        if (qty <= 15) return { label: `Low Stock (${qty})`, cls: "bg-yellow-500/10 text-yellow-500" };
-        return { label: `In Stock (${qty})`, cls: "bg-green-500/10 text-green-500" };
+    const filteredProducts = products.filter((product) =>
+        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.category.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        const newProduct: any = {
+            id: String(products.length + 1),
+            ...formData,
+            price: parseFloat(formData.price),
+            dimensions: "200cm x 70cm",
+            image: "https://images.unsplash.com/photo-1601924994987-69e26d50dc26?w=800",
+            images: ["https://images.unsplash.com/photo-1601924994987-69e26d50dc26?w=800"],
+            inStock: true,
+            featured: false,
+        };
+        setProducts([...products, newProduct]);
+        setShowAddModal(false);
+        setFormData({
+            name: "",
+            price: "",
+            category: "Pashmina",
+            fabric: "",
+            color: "",
+            description: "",
+        });
+        toast.success("Product Added", {
+            description: "New product has been added successfully",
+        });
+    };
+
+    const deleteProduct = (id: string) => {
+        setProducts(products.filter((p) => p.id !== id));
+        toast.success("Product Deleted", {
+            description: "Product has been removed from inventory",
+        });
     };
 
     return (
-        <div>
+        <div className="p-4 lg:p-8">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
                 <div>
-                    <h1 className="text-2xl font-bold text-foreground">Product Inventory</h1>
-                    <p className="text-sm text-muted-foreground">Manage and monitor your catalog&apos;s availability and pricing.</p>
+                    <h1 className="text-3xl md:text-4xl text-white mb-2">Products Management</h1>
+                    <p className="text-white/60">Manage your product inventory</p>
                 </div>
-                <div className="flex items-center gap-3">
-                    <div className="flex bg-secondary rounded-lg border border-border text-xs font-medium">
-                        <button className="px-3 py-1.5 bg-foreground text-background rounded-lg">All Items</button>
-                        <button className="px-3 py-1.5 text-muted-foreground hover:text-foreground transition-colors">Active</button>
-                        <button className="px-3 py-1.5 text-muted-foreground hover:text-foreground transition-colors">Archived</button>
-                    </div>
-                    <button className="flex items-center gap-1.5 px-3 py-1.5 border border-border rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground transition-colors">
-                        <Filter size={14} />
-                        Filter
-                    </button>
+                <button
+                    onClick={() => setShowAddModal(true)}
+                    className="mt-4 md:mt-0 px-6 py-3 bg-gold text-black font-semibold rounded-lg hover:bg-gold-light transition-all duration-300 flex items-center space-x-2"
+                >
+                    <Plus className="w-5 h-5" />
+                    <span>Add New Product</span>
+                </button>
+            </div>
+
+            {/* Search */}
+            <div className="bg-card border border-white/10 rounded-xl p-6 mb-8">
+                <div className="relative">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
+                    <input
+                        type="text"
+                        placeholder="Search products..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-gold transition-colors duration-300"
+                    />
                 </div>
             </div>
 
-            {/* Table */}
-            <div className="bg-card rounded-xl border border-border overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left">
-                        <thead>
-                            <tr className="border-b border-border">
-                                <th className="py-3 px-4 text-[10px] font-bold tracking-widest uppercase text-primary">Thumbnail</th>
-                                <th className="py-3 px-4 text-[10px] font-bold tracking-widest uppercase text-primary">Product Name</th>
-                                <th className="py-3 px-4 text-[10px] font-bold tracking-widest uppercase text-primary">Material</th>
-                                <th className="py-3 px-4 text-[10px] font-bold tracking-widest uppercase text-primary">Price</th>
-                                <th className="py-3 px-4 text-[10px] font-bold tracking-widest uppercase text-primary">Stock Status</th>
-                                <th className="py-3 px-4 text-[10px] font-bold tracking-widest uppercase text-primary text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-border">
-                            {allProducts.length === 0 ? (
-                                <tr>
-                                    <td colSpan={6} className="py-12 text-center text-muted-foreground text-sm">
-                                        No products found. Click &quot;+ New Product&quot; to start building your catalog.
-                                    </td>
-                                </tr>
-                            ) : (
-                                allProducts.map((product) => {
-                                    const stock = getStockBadge(product.stockQuantity);
-                                    return (
-                                        <tr key={product.id} className="hover:bg-secondary/30 transition-colors">
-                                            <td className="py-3 px-4">
-                                                <div className="w-12 h-12 rounded-lg overflow-hidden bg-secondary">
-                                                    <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
-                                                </div>
-                                            </td>
-                                            <td className="py-3 px-4">
-                                                <p className="font-semibold text-foreground text-sm line-clamp-1">{product.name}</p>
-                                            </td>
-                                            <td className="py-3 px-4 text-sm text-muted-foreground">
-                                                {product.categoryName || "Uncategorized"}
-                                            </td>
-                                            <td className="py-3 px-4 text-sm font-semibold text-primary">
-                                                Rs. {Number(product.price).toLocaleString()}
-                                            </td>
-                                            <td className="py-3 px-4">
-                                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold ${stock.cls}`}>
-                                                    <span className="w-1.5 h-1.5 rounded-full bg-current" />
-                                                    {stock.label}
-                                                </span>
-                                            </td>
-                                            <td className="py-3 px-4 text-right">
-                                                <div className="flex items-center justify-end gap-2">
-                                                    <Link
-                                                        href={`/admin/products/${product.id}/edit`}
-                                                        className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
-                                                        title="Edit"
-                                                    >
-                                                        <Edit size={16} />
-                                                    </Link>
-                                                    <form action={async () => { "use server"; await deleteProduct(product.id); }}>
-                                                        <button
-                                                            type="submit"
-                                                            className="p-2 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
-                                                            title="Delete"
-                                                        >
-                                                            <Trash2 size={16} />
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    );
-                                })
+            {/* Products Grid */}
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {filteredProducts.map((product) => (
+                    <div
+                        key={product.id}
+                        className="bg-card border border-white/10 rounded-xl overflow-hidden hover:border-gold/30 transition-all duration-300"
+                    >
+                        <div className="relative aspect-square">
+                            <img
+                                src={product.image}
+                                alt={product.name}
+                                className="w-full h-full object-cover"
+                            />
+                            {!product.inStock && (
+                                <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                                    <span className="px-4 py-2 bg-destructive text-white font-semibold rounded-lg">
+                                        Out of Stock
+                                    </span>
+                                </div>
                             )}
-                        </tbody>
-                    </table>
-                </div>
+                        </div>
 
-                {/* Pagination Footer */}
-                {allProducts.length > 0 && (
-                    <div className="border-t border-border px-4 py-3 flex items-center justify-between">
-                        <p className="text-xs text-muted-foreground">
-                            Showing <span className="text-foreground font-semibold">1</span> to{" "}
-                            <span className="text-foreground font-semibold">{allProducts.length}</span> of{" "}
-                            <span className="text-foreground font-semibold">{allProducts.length}</span> products
-                        </p>
-                        <div className="flex items-center gap-1">
-                            <button className="w-8 h-8 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">1</button>
+                        <div className="p-4">
+                            <p className="text-xs text-gold uppercase tracking-wider mb-1">
+                                {product.category}
+                            </p>
+                            <h3 className="text-white font-semibold mb-2 line-clamp-1">
+                                {product.name}
+                            </h3>
+                            <p className="text-2xl font-bold text-gold mb-4">${product.price}</p>
+
+                            <div className="flex gap-2">
+                                <button className="flex-1 py-2 bg-white/5 border border-white/10 text-white rounded-lg hover:bg-white/10 hover:border-gold transition-all duration-300 flex items-center justify-center space-x-2">
+                                    <Edit className="w-4 h-4" />
+                                    <span className="text-sm">Edit</span>
+                                </button>
+                                <button
+                                    onClick={() => deleteProduct(product.id)}
+                                    className="px-4 py-2 bg-destructive/10 border border-destructive/30 text-destructive rounded-lg hover:bg-destructive hover:text-white transition-all duration-300"
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                </button>
+                            </div>
                         </div>
                     </div>
-                )}
+                ))}
             </div>
+
+            {/* Add Product Modal */}
+            <Dialog.Root open={showAddModal} onOpenChange={setShowAddModal}>
+                <Dialog.Portal>
+                    <Dialog.Overlay className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50" />
+                    <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-card border border-white/10 rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto z-50">
+                        <Dialog.Close className="absolute top-4 right-4 w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-gold hover:text-black transition-all">
+                            <X className="w-5 h-5" />
+                        </Dialog.Close>
+
+                        <h2 className="text-2xl font-semibold text-white mb-6">
+                            Add New Product
+                        </h2>
+
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            {/* Image Upload */}
+                            <div>
+                                <label className="block text-white mb-2">Product Image</label>
+                                <div className="border-2 border-dashed border-white/10 rounded-lg p-8 text-center hover:border-gold/30 transition-colors cursor-pointer">
+                                    <Upload className="w-12 h-12 text-white/40 mx-auto mb-4" />
+                                    <p className="text-white/60 mb-2">Click to upload or drag and drop</p>
+                                    <p className="text-white/40 text-sm">PNG, JPG up to 10MB</p>
+                                </div>
+                            </div>
+
+                            <div className="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <label className="block text-white mb-2">Product Name *</label>
+                                    <input
+                                        type="text"
+                                        value={formData.name}
+                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                        required
+                                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-gold transition-colors duration-300"
+                                        placeholder="Luxury Scarf Name"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-white mb-2">Price *</label>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        value={formData.price}
+                                        onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                                        required
+                                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-gold transition-colors duration-300"
+                                        placeholder="299.99"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-white mb-2">Category *</label>
+                                    <select
+                                        value={formData.category}
+                                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-gold transition-colors duration-300"
+                                    >
+                                        <option value="Pashmina">Pashmina</option>
+                                        <option value="Silk">Silk</option>
+                                        <option value="Wool">Wool</option>
+                                        <option value="Cashmere">Cashmere</option>
+                                        <option value="Velvet">Velvet</option>
+                                        <option value="Hijab">Hijab</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-white mb-2">Fabric *</label>
+                                    <input
+                                        type="text"
+                                        value={formData.fabric}
+                                        onChange={(e) => setFormData({ ...formData, fabric: e.target.value })}
+                                        required
+                                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-gold transition-colors duration-300"
+                                        placeholder="100% Pure Silk"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-white mb-2">Color *</label>
+                                    <input
+                                        type="text"
+                                        value={formData.color}
+                                        onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                                        required
+                                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-gold transition-colors duration-300"
+                                        placeholder="Gold"
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-white mb-2">Description *</label>
+                                <textarea
+                                    value={formData.description}
+                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                    required
+                                    rows={4}
+                                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-gold transition-colors duration-300 resize-none"
+                                    placeholder="Product description..."
+                                />
+                            </div>
+
+                            <button
+                                type="submit"
+                                className="w-full py-4 bg-gold text-black font-semibold rounded-lg hover:bg-gold-light transition-all duration-300"
+                            >
+                                Add Product
+                            </button>
+                        </form>
+                    </Dialog.Content>
+                </Dialog.Portal>
+            </Dialog.Root>
         </div>
     );
 }
