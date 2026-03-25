@@ -1,187 +1,194 @@
-"use client";
-
-import Navbar from "@/components/storefront/Navbar";
-import Footer from "@/components/storefront/Footer";
-import { Mail, Phone, MapPin, MessageCircle, Navigation } from "lucide-react";
+"use client"
+import { Clock, Mail, MapPin, Phone, Send } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export default function ContactPage() {
+    const [formData, setFormData] = useState({
+        name: "",
+        email: "",
+        subject: "",
+        message: "",
+    });
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        toast.success("Message Sent!", {
+            description: "We'll get back to you within 24 hours",
+        });
+        setFormData({ name: "", email: "", subject: "", message: "" });
+    };
+
     return (
-        <div className="min-h-screen bg-[#0d0f14] text-white">
-            <Navbar />
+        <div className="min-h-screen pt-20">
+            {/* Hero */}
+            <section className="relative py-20 px-4 sm:px-6 lg:px-8 bg-linear-to-b from-black to-black/50">
+                <div className="max-w-7xl mx-auto text-center">
+                    <h1 className="text-5xl md:text-6xl lg:text-7xl text-white mb-6">
+                        Get in Touch
+                    </h1>
+                    <p className="text-xl text-white/70 max-w-2xl mx-auto">
+                        We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+                    </p>
+                </div>
+            </section>
 
-            <main className="pt-24 pb-16">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
+            {/* Contact Content */}
+            <section className="py-12 px-4 sm:px-6 lg:px-8">
+                <div className="max-w-7xl mx-auto">
+                    <div className="grid lg:grid-cols-3 gap-12">
+                        {/* Contact Info */}
+                        <div className="space-y-8">
+                            <div>
+                                <h2 className="text-3xl text-white mb-6">Contact Information</h2>
+                                <p className="text-white/60 mb-8">
+                                    Reach out to us through any of these channels
+                                </p>
+                            </div>
 
-                        {/* ===== LEFT SIDE ===== */}
-                        <div>
-                            <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4 leading-tight">
-                                Let&apos;s start a<br />conversation.
-                            </h1>
-                            <p className="text-sm text-white/45 mb-10 max-w-md leading-relaxed">
-                                Questions about our fabrics, shipping, or looking for a custom order? Our team is here to help you find the perfect piece.
-                            </p>
-
-                            {/* 2x2 Contact Cards */}
-                            <div className="grid grid-cols-2 gap-3 mb-6">
-                                {[
-                                    {
-                                        icon: Mail,
-                                        title: "Email us",
-                                        desc: "Our friendly team is here to help.",
-                                        link: "hello@scarfhaven.com",
-                                    },
-                                    {
-                                        icon: Phone,
-                                        title: "Call us",
-                                        desc: "Mon-Fri from 8am to 5pm.",
-                                        link: "+1 (555) 000-0000",
-                                    },
-                                    {
-                                        icon: MapPin,
-                                        title: "Visit store",
-                                        desc: "Stop by our flagship showroom.",
-                                        link: "123 Silk Road, Textile District, NY",
-                                    },
-                                    {
-                                        icon: MessageCircle,
-                                        title: "Live support",
-                                        desc: "Available for quick queries.",
-                                        link: "Start a live chat",
-                                    },
-                                ].map((item) => (
-                                    <div
-                                        key={item.title}
-                                        className="bg-[#12172a] border border-[#1e2640] rounded-xl p-5"
-                                    >
-                                        <div className="w-9 h-9 rounded-lg bg-[#c9a84c]/10 border border-[#c9a84c]/20 flex items-center justify-center mb-4">
-                                            <item.icon size={16} className="text-[#c9a84c]" strokeWidth={1.5} />
-                                        </div>
-                                        <h3 className="font-bold text-white text-sm mb-1">{item.title}</h3>
-                                        <p className="text-xs text-white/40 mb-3 leading-relaxed">{item.desc}</p>
-                                        <p className="text-xs font-semibold text-[#c9a84c] cursor-pointer hover:text-[#e0bc6a] transition-colors">
-                                            {item.link}
+                            <div className="space-y-6">
+                                <div className="flex items-start space-x-4">
+                                    <div className="w-12 h-12 bg-gold/10 border border-gold/30 rounded-lg flex items-center justify-center shrink-0">
+                                        <MapPin className="w-6 h-6 text-gold" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-white font-semibold mb-1">Address</h3>
+                                        <p className="text-white/60">
+                                            123 Fashion Street<br />
+                                            Lahore, Punjab 54000<br />
+                                            Pakistan
                                         </p>
                                     </div>
-                                ))}
+                                </div>
+
+                                <div className="flex items-start space-x-4">
+                                    <div className="w-12 h-12 bg-gold/10 border border-gold/30 rounded-lg flex items-center justify-center shrink-0">
+                                        <Phone className="w-6 h-6 text-gold" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-white font-semibold mb-1">Phone</h3>
+                                        <p className="text-white/60">+92 300 1234567</p>
+                                        <p className="text-white/60">+92 321 9876543</p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-start space-x-4">
+                                    <div className="w-12 h-12 bg-gold/10 border border-gold/30 rounded-lg flex items-center justify-center shrink-0">
+                                        <Mail className="w-6 h-6 text-gold" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-white font-semibold mb-1">Email</h3>
+                                        <p className="text-white/60">hello@luxescarves.com</p>
+                                        <p className="text-white/60">support@luxescarves.com</p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-start space-x-4">
+                                    <div className="w-12 h-12 bg-gold/10 border border-gold/30 rounded-lg flex items-center justify-center shrink-0">
+                                        <Clock className="w-6 h-6 text-gold" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-white font-semibold mb-1">Hours</h3>
+                                        <p className="text-white/60">Mon - Fri: 9:00 AM - 6:00 PM</p>
+                                        <p className="text-white/60">Sat: 10:00 AM - 4:00 PM</p>
+                                        <p className="text-white/60">Sun: Closed</p>
+                                    </div>
+                                </div>
                             </div>
 
-                            {/* Map Section */}
-                            <div className="relative rounded-xl overflow-hidden border border-[#1e2640]" style={{ height: "220px" }}>
-                                <iframe
-                                    src="https://www.openstreetmap.org/export/embed.html?bbox=-74.05%2C40.68%2C-73.95%2C40.78&layer=mapnik"
-                                    width="100%"
-                                    height="100%"
-                                    style={{ border: 0, filter: "invert(90%) hue-rotate(180deg) brightness(0.8) contrast(1.1)" }}
-                                    loading="lazy"
-                                    title="Store Location"
-                                />
-                                {/* Get Directions button */}
-                                <div className="absolute bottom-4 left-4">
-                                    <button className="inline-flex items-center gap-2 bg-[#0d0f14] border border-[#2a3040] text-white text-xs font-bold tracking-wider uppercase px-4 py-2.5 rounded-lg hover:border-[#c9a84c] hover:text-[#c9a84c] transition-colors">
-                                        <Navigation size={12} />
-                                        Get Directions
+                        </div>
+
+                        {/* Contact Form */}
+                        <div className="lg:col-span-2">
+                            <div className="bg-linear-to-br from-white/5 to-white/2 border border-white/10 rounded-2xl p-8 backdrop-blur-sm">
+                                <h2 className="text-2xl font-semibold text-white mb-6">
+                                    Send us a Message
+                                </h2>
+
+                                <form onSubmit={handleSubmit} className="space-y-6">
+                                    <div className="grid md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label className="block text-white mb-2">Your Name *</label>
+                                            <input
+                                                type="text"
+                                                name="name"
+                                                value={formData.name}
+                                                onChange={handleChange}
+                                                required
+                                                className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-gold transition-colors duration-300"
+                                                placeholder="John Doe"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-white mb-2">Email Address *</label>
+                                            <input
+                                                type="email"
+                                                name="email"
+                                                value={formData.email}
+                                                onChange={handleChange}
+                                                required
+                                                className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-gold transition-colors duration-300"
+                                                placeholder="john@example.com"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-white mb-2">Subject *</label>
+                                        <input
+                                            type="text"
+                                            name="subject"
+                                            value={formData.subject}
+                                            onChange={handleChange}
+                                            required
+                                            className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-gold transition-colors duration-300"
+                                            placeholder="How can we help?"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-white mb-2">Message *</label>
+                                        <textarea
+                                            name="message"
+                                            value={formData.message}
+                                            onChange={handleChange}
+                                            required
+                                            rows={6}
+                                            className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-gold transition-colors duration-300 resize-none"
+                                            placeholder="Tell us more about your inquiry..."
+                                        />
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        className="w-full py-4 bg-gold text-black font-semibold rounded-lg hover:bg-gold-light transition-all duration-300 hover:shadow-[0_0_30px_rgba(212,175,55,0.3)] flex items-center justify-center space-x-2"
+                                    >
+                                        <Send className="w-5 h-5" />
+                                        <span>Send Message</span>
                                     </button>
-                                </div>
+                                </form>
                             </div>
                         </div>
+                    </div>
 
-                        {/* ===== RIGHT SIDE — Contact Form ===== */}
-                        <div className="bg-[#12172a] border border-[#1e2640] rounded-xl p-8">
-                            <form className="space-y-5">
-                                {/* Name row */}
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-[10px] font-bold tracking-[0.15em] uppercase text-white/40 mb-2">
-                                            First Name
-                                        </label>
-                                        <input
-                                            type="text"
-                                            placeholder="Jane"
-                                            className="w-full bg-[#0d0f14] border border-[#2a3040] rounded-lg px-4 py-3 text-sm text-white placeholder-white/20 outline-none focus:border-[#c9a84c] transition-colors"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-[10px] font-bold tracking-[0.15em] uppercase text-white/40 mb-2">
-                                            Last Name
-                                        </label>
-                                        <input
-                                            type="text"
-                                            placeholder="Doe"
-                                            className="w-full bg-[#0d0f14] border border-[#2a3040] rounded-lg px-4 py-3 text-sm text-white placeholder-white/20 outline-none focus:border-[#c9a84c] transition-colors"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Email */}
-                                <div>
-                                    <label className="block text-[10px] font-bold tracking-[0.15em] uppercase text-white/40 mb-2">
-                                        Email Address
-                                    </label>
-                                    <input
-                                        type="email"
-                                        placeholder="jane@example.com"
-                                        className="w-full bg-[#0d0f14] border border-[#2a3040] rounded-lg px-4 py-3 text-sm text-white placeholder-white/20 outline-none focus:border-[#c9a84c] transition-colors"
-                                    />
-                                </div>
-
-                                {/* Subject */}
-                                <div>
-                                    <label className="block text-[10px] font-bold tracking-[0.15em] uppercase text-white/40 mb-2">
-                                        Subject
-                                    </label>
-                                    <select className="w-full bg-[#0d0f14] border border-[#2a3040] rounded-lg px-4 py-3 text-sm text-white/60 outline-none focus:border-[#c9a84c] transition-colors appearance-none cursor-pointer">
-                                        <option>Select a topic</option>
-                                        <option>Order Inquiry</option>
-                                        <option>Product Question</option>
-                                        <option>Shipping & Delivery</option>
-                                        <option>Returns & Exchange</option>
-                                        <option>Custom Order</option>
-                                        <option>Other</option>
-                                    </select>
-                                </div>
-
-                                {/* Message */}
-                                <div>
-                                    <label className="block text-[10px] font-bold tracking-[0.15em] uppercase text-white/40 mb-2">
-                                        Message
-                                    </label>
-                                    <textarea
-                                        rows={5}
-                                        placeholder="How can we help you?"
-                                        className="w-full bg-[#0d0f14] border border-[#2a3040] rounded-lg px-4 py-3 text-sm text-white placeholder-white/20 outline-none focus:border-[#c9a84c] transition-colors resize-none"
-                                    />
-                                </div>
-
-                                {/* Checkbox */}
-                                <label className="flex items-center gap-2.5 cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        className="w-4 h-4 rounded border-[#2a3040] bg-[#0d0f14] accent-[#c9a84c]"
-                                    />
-                                    <span className="text-xs text-white/35">
-                                        You agree to our friendly{" "}
-                                        <span className="text-[#c9a84c] underline cursor-pointer hover:text-[#e0bc6a]">
-                                            privacy policy
-                                        </span>.
-                                    </span>
-                                </label>
-
-                                {/* Submit Button */}
-                                <button
-                                    type="submit"
-                                    className="w-full bg-[#c9a84c] text-black font-black text-xs tracking-[0.2em] uppercase py-4 rounded-lg hover:bg-[#e0bc6a] transition-all duration-300 hover:shadow-[0_0_25px_rgba(201,168,76,0.3)]"
-                                >
-                                    Send Message
-                                </button>
-                            </form>
-                        </div>
-
+                    {/* Map */}
+                    <div className="mt-16 h-96 bg-linear-to-br from-white/5 to-white/2 border border-white/10 rounded-2xl overflow-hidden">
+                        <iframe
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d435519.2274264282!2d74.00471679999999!3d31.5203696!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39190483e58107d9%3A0xc23abe6ccc7e2462!2sLahore%2C%20Pakistan!5e0!3m2!1sen!2s!4v1234567890123!5m2!1sen!2s"
+                            width="100%"
+                            height="100%"
+                            style={{ border: 0, filter: "grayscale(1) invert(1) contrast(1.2)" }}
+                            allowFullScreen
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                        />
                     </div>
                 </div>
-            </main>
-
-            <Footer />
+            </section>
         </div>
     );
 }
