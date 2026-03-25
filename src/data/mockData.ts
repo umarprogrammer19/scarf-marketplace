@@ -141,7 +141,7 @@ export const products: Product[] = [
         ],
         inStock: true,
         featured: false,
-        isNew: true,
+        isNew: false,
     },
     {
         id: '6',
