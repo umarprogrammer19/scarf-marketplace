@@ -1,3 +1,4 @@
+import FAQs from "@/components/home/faqs";
 import FlashSale from "@/components/home/flash-sale";
 import Hero from "@/components/home/hero-section";
 import NewArrivals from "@/components/home/new-arrivals";
@@ -204,34 +205,7 @@ export default async function HomePage() {
                 </div>
             </section> */}
             <Reviews />
-            {/* ===== NEWSLETTER ===== */}
-            {/* <ScrollReveal>
-                <section className="py-14 md:py-16 bg-card border-y border-border">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                            <div className="max-w-md">
-                                <h2 className="text-xl md:text-2xl font-bold text-foreground mb-2">
-                                    Join the Al Faizan Inner Circle
-                                </h2>
-                                <p className="text-sm text-muted-foreground">
-                                    Receive exclusive previews of our seasonal collections and styling tips from fashion experts.
-                                </p>
-                            </div>
-                            <div className="flex w-full md:w-auto">
-                                <input
-                                    type="email"
-                                    placeholder="Enter your email"
-                                    className="flex-1 md:w-64 bg-secondary border border-border rounded-l-lg px-4 py-2.5 text-sm text-foreground placeholder-muted-foreground outline-none focus:border-primary transition-colors"
-                                />
-                                <button className="bg-primary text-primary-foreground px-5 py-2.5 rounded-r-lg font-bold text-xs tracking-wider uppercase hover:bg-primary/90 transition-colors whitespace-nowrap">
-                                    Subscribe Now
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            </ScrollReveal> */}
-
+            <FAQs />
             <Footer />
         </div>
     );
