@@ -1,15 +1,14 @@
+import Hero from "@/components/home/hero-section";
+import Footer from "@/components/storefront/Footer";
+import Navbar from "@/components/storefront/Navbar";
+import ProductCard from "@/components/storefront/ProductCard";
+import ProductCarousel3D from "@/components/storefront/ProductCarousel3D";
+import ScrollReveal from "@/components/storefront/ScrollReveal";
 import { db } from "@/db";
 import { products } from "@/db/schema";
 import { desc } from "drizzle-orm";
-import Navbar from "@/components/storefront/Navbar";
-import ProductCard from "@/components/storefront/ProductCard";
-import Footer from "@/components/storefront/Footer";
-import ScrollReveal from "@/components/storefront/ScrollReveal";
-import ProductCarousel3D from "@/components/storefront/ProductCarousel3D";
-import ParticleBackground from "@/components/storefront/ParticleBackground";
-import { ChevronRight, Award, Diamond, Paintbrush, Sparkles } from "lucide-react";
+import { Award, ChevronRight, Diamond, Paintbrush, Sparkles } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 
 export const revalidate = 60;
 
@@ -25,9 +24,8 @@ export default async function HomePage() {
             <Navbar />
 
             {/* ===== HERO SECTION ===== */}
-            <section className="relative w-full min-h-[85vh] flex items-center overflow-hidden pt-16">
-                {/* Three.js Particle Morphing Background */}
-                <ParticleBackground />
+            <Hero />
+            {/* <section className="relative w-full min-h-[85vh] flex items-center overflow-hidden pt-16">
                 <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/20" />
 
                 <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
@@ -89,7 +87,7 @@ export default async function HomePage() {
                         </ScrollReveal>
                     </div>
                 </div>
-            </section>
+            </section> */}
 
             {/* ===== 3D ROTATING CAROUSEL — Exclusive Collection ===== */}
             {latestProducts.length > 0 && (
