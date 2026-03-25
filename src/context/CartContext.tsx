@@ -1,3 +1,4 @@
+"use client"
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { CartItem, Product } from '../data/mockData';
 import { toast } from 'sonner';
