@@ -16,9 +16,12 @@ function mapProductToUI(dbProduct: any): Product {
         fabric: dbProduct.fabric || "",
         dimensions: dbProduct.dimensions || "",
         color: dbProduct.color || "",
-        category: dbProduct.category?.name || "Uncategorized", // Pulled from the relation!
+        category: dbProduct.category?.name || "Uncategorized", 
         image: dbProduct.image,
         images: dbProduct.images || [dbProduct.image],
+        
+        stockQuantity: dbProduct.stockQuantity || 0, // <--- ADD THIS LINE
+        
         inStock: dbProduct.inStock,
         featured: dbProduct.featured,
         isNew: dbProduct.isNew,
