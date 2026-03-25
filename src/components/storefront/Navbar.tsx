@@ -76,13 +76,6 @@ export default function Navbar() {
 
                         {/* Actions */}
                         <div className="flex items-center space-x-4">
-                            <button
-                                className="text-white/80 hover:text-gold transition-colors duration-300 hidden md:block"
-                                aria-label="Search"
-                            >
-                                <Search className="w-5 h-5" />
-                            </button>
-
                             <Link
                                 href="/cart"
                                 className="relative text-white/80 hover:text-gold transition-colors duration-300"
