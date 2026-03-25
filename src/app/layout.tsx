@@ -26,7 +26,7 @@ export default function RootLayout({
           <Navbar />
           {children}
           <Toaster
-            position="top-right"
+            position="bottom-right"
             toastOptions={{
               style: {
                 background: '#0a0a0a',
