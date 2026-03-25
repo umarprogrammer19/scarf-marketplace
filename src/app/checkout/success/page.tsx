@@ -1,13 +1,14 @@
 "use client"
+import { useCart } from "@/context/CartContext";
 import confetti from "canvas-confetti";
 import { ArrowRight, CheckCircle, Package } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useId } from "react";
+import { useEffect } from "react";
 
 export default function OrderSuccessPage() {
     const location = useSearchParams();
-    console.log(location)
+    const { clearCart } = useCart()
     const orderId = location || "ORD-UNKNOWN";
 
     useEffect(() => {
@@ -18,6 +19,7 @@ export default function OrderSuccessPage() {
             origin: { y: 0.6 },
             colors: ['#D4AF37', '#F4E4BE', '#B8941F'],
         });
+        clearCart()
     }, []);
 
     return (

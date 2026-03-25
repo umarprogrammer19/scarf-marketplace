@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 export default function CheckoutPage() {
-    const { cart, getCartTotal, clearCart } = useCart();
+    const { cart, getCartTotal } = useCart();
     const navigate = useRouter();
     const [formData, setFormData] = useState({
         fullName: "",
@@ -33,7 +33,6 @@ export default function CheckoutPage() {
         });
 
         navigate.push(`/checkout/success?${orderId}`);
-        return;
     };
 
     if (cart.length === 0) {
